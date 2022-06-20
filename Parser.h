@@ -37,6 +37,15 @@ enum BoolOperator
     LESS
 };
 
+enum Operator
+{
+    ADD,
+    SUB,
+    DIV,
+    MUL,
+    MOD
+};
+
 class Parser
 {
 public:
@@ -69,6 +78,8 @@ std::string End();
 
 void Goto(size_t);
 void ReAssignVar();
+
+signed long int Math();
 
 bool CheckIf(const std::string&,
              enum BoolOperator,

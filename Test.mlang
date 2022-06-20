@@ -1,3 +1,28 @@
-LET str: "Hello World!"
+PRINT "Hello World!\n"
 
-PRINT str
+// integer
+LET var: 100
+
+// still an integer
+var: 200
+
+// double
+//    / - (notice the asterisk)
+var: *1.5
+
+PRINT "var is equal to " var "\n"
+
+//             / - (line of the ENDIF statement)
+IF 100 < 200 1800
+    PRINT "Obviously\n"
+ENDIF
+
+LET i: 0
+
+IF i < 9 2600
+    PRINT i "\n"
+    i + 1
+    GOTO 220
+ENDIF
+
+END

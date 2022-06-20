@@ -91,7 +91,14 @@ void Parser::ParseID()
                 {
                     ReAssignVar();
                 }
+                else if (tokensOnLine[i + 1].type == OPERATOR
+                         && tokensOnLine[i + 1].text != ":")
+                {
+                    const std::string &varName {tokensOnLine[0].text};
+                    signed long int newVal {Math()};
 
+                    variables[varName].text = std::to_string(newVal);
+                }
                 break;
             }
         }
@@ -633,7 +640,7 @@ void ReAssignVar()
 
             case 2:
                 if (tokensOnLine[2].type == OPERATOR
-                    && tokensOnLine[2].text != "*")
+                    && tokensOnLine[2].text == "*")
                 {
                     /* Changing data-type */
                     variables[var].dataType = tokensOnLine[3].type;
@@ -659,4 +666,164 @@ void ReAssignVar()
                 break;
         }
     }
+}
+
+void ParseMath(const std::string &lhs, Operator op, const std::string &rhs, signed long int &ref)
+{
+    int x {stoi(lhs)}, y {stoi(rhs)};
+
+    switch (op)
+    {
+        case ADD:
+            ref = x + y;
+            break;
+
+        case SUB:
+            ref = x - y;
+            break;
+
+        case MUL:
+            ref = x * y;
+            break;
+
+        case DIV:
+            ref = x / y;
+            break;
+
+        case MOD:
+            ref = x % y;
+            break;
+    }
+}
+
+signed long int Math()
+{
+    signed long int ret {};
+
+    std::string lhs, rhs;
+    Operator op;
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Token &curToken {tokensOnLine[i]};
+
+        switch (i)
+        {
+            case 0:
+                if (curToken.type == IDENTIFIER)
+                {
+                    if (InArray(curToken.text, Funcs))
+                    {
+                        /* Function call */
+
+                        lhs = (strFunc[curToken.text]());
+
+                        break;
+                    }
+
+                    if (IsVar(curToken.text))
+                    {
+                        lhs = (variables[curToken.text].text);
+
+                        break;
+                    }
+
+                    throw std::runtime_error
+                            (
+                                    std::string("Unexpected Identifier: ")
+                                    + tokensOnLine[i].text
+                                    + std::string(". (")
+                                    + std::to_string(tokensOnLine[i].lineNumber)
+                                    + std::string(", ")
+                                    + std::to_string(tokensOnLine[i].charIndex)
+                                    + std::string(").")
+                            );
+                }
+                else
+                {
+                    lhs = curToken.text;
+                }
+                break;
+
+            case 1:
+                if (curToken.type != OPERATOR)
+                {
+                    throw std::runtime_error
+                            (
+                                    std::string("Unexpected token: ")
+                                    + tokensOnLine[i].text
+                                    + std::string(". (")
+                                    + std::to_string(tokensOnLine[i].lineNumber)
+                                    + std::string(", ")
+                                    + std::to_string(tokensOnLine[i].charIndex)
+                                    + std::string(").")
+                            );
+                }
+
+                if (curToken.text == "+")
+                    op = ADD;
+                else if (curToken.text == "-")
+                    op = SUB;
+                else if (curToken.text == "*")
+                    op = MUL;
+                else if (curToken.text == "/")
+                    op = DIV;
+                else if (curToken.text == "%")
+                    op = MOD;
+                else
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Unexpected operator: ")
+                        + tokensOnLine[i].text
+                        + std::string(". (")
+                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::string(", ")
+                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::string(").")
+                    );
+                }
+                break;
+
+            case 2:
+                if (curToken.type == IDENTIFIER)
+                {
+                    if (InArray(curToken.text, Funcs))
+                    {
+                        /* Function call */
+
+                        rhs = (strFunc[curToken.text]());
+
+                        break;
+                    }
+
+                    if (IsVar(curToken.text))
+                    {
+                        rhs = (variables[curToken.text].text);
+
+                        break;
+                    }
+
+                    throw std::runtime_error
+                    (
+                        std::string("Unexpected Identifier: ")
+                        + tokensOnLine[i].text
+                        + std::string(". (")
+                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::string(", ")
+                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::string(").")
+                    );
+                }
+                else
+                {
+                    rhs = curToken.text;
+                }
+                break;
+        }
+    }
+
+    ParseMath(lhs, op, rhs, ret);
+
+    return ret;
 }
