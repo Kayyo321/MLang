@@ -1,0 +1,9 @@
+//GOTO statements are the same as in C++:
+
+PRINT "Mornin'\n"
+
+GOTO 30
+
+// ^ Prints "Mornin'" and a new line,
+// then goes back to that line, and repeats.
+// (Infinite loop)

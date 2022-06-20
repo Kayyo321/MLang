@@ -1,0 +1,5 @@
+// END will end the program whenever it is hit:
+
+IF 200 < 300 50
+    END // Will always end, since 200 is always less than 300.
+ENDIF

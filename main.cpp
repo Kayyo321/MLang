@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     Lexer lexer {};
 
-    std::vector<Token> tokens {lexer.Parse(contents)};
+    std::vector<Token> tokens {lexer.Parse(contents, debug)};
 
     if (debug)
         std::cout << "\n" << tokens.size() << " tokens found:\n{\n\n";

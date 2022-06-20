@@ -1,0 +1,17 @@
+// Creating a variable is done as such:
+// LET keyword, var-name, colon, value.
+// The data-type will based on the init-value:
+
+LET var: 100 // integer
+
+// Re-assigning a variable is like initializing it,
+// but without the LET keyword:
+
+var: 200 // still an integer
+
+// You can change a variables data-type by
+// re-assigning it with a '*' before the value:
+
+var: *1.5 // double
+
+// Now the variable 'var' is a double, and is '1.5'.

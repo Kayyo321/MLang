@@ -1,7 +1,9 @@
 #include "Lexer.h"
 
-std::vector<Token> Lexer::Parse(const std::string &file)
+std::vector<Token> Lexer::Parse(const std::string &file, bool _isDebug)
 {
+    isDebug = _isDebug;
+
     const size_t len {file.length()};
     char program[len + 1];
 
@@ -238,7 +240,7 @@ std::vector<Token> Lexer::Parse(const std::string &file)
 
 void Lexer::NewToken()
 {
-    if (curToken.type == COMMENT)
+    if (curToken.type == COMMENT && isDebug)
     {
         std::cout << "/*\n" << curToken.text << "\n*/\n";
     }

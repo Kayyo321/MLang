@@ -10,11 +10,13 @@
 class Lexer
 {
 public:
-    std::vector<Token> Parse(const std::string&);
+    std::vector<Token> Parse(const std::string&, bool);
 
 private:
     Token curToken;
     std::vector<Token> tokens;
+
+    bool isDebug;
 
     void NewToken();
 };

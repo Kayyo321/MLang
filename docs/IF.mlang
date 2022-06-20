@@ -1,0 +1,26 @@
+// IF statements are a bit different;
+// you can only have one boolean operator per statement:
+
+//     operator
+//        |
+//    lhs | rhs
+//     /  |  \
+// IF 100 ? 200
+
+// '?' means equals
+// '!' means not-equals
+// '<' means less-than
+// '>' means greater-than
+
+// IF statements are structured as such:
+
+// The line of the ENDIF statement must be added at the
+// end of a IF statement: \
+//                         |
+//                    -----
+//                  /
+//                /
+//              / (ENDIF line number)
+IF 100 < 200 2600 // Lines go up by 10 in MyLang
+    // Do something
+ENDIF

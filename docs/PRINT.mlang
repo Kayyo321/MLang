@@ -1,0 +1,12 @@
+// Using PRINT is as easy as it looks:
+
+PRINT "Hello World!"
+
+// PRINT can be used with any data-type;
+// each argument must be seperated with a space:
+
+PRINT "An arg, " "And another"
+
+// '\n' is used to add a new line:
+
+PRINT "\nOne line" "\nAnd another...\n"

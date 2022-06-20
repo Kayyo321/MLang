@@ -8,3 +8,6 @@
 2	733	6774623350417012	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
 5	1059	6774623353662025	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
 1059	1251	6774623355579920	Basic.exe	fded637503ef2db6
+7	765	6774633693341031	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
+2	677	6774633811087899	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
+677	871	6774633812990715	Basic.exe	fded637503ef2db6
