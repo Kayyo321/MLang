@@ -14,8 +14,9 @@ Why not?
   * Arguments are:
 
 ```MLangExec Test.mlang``` (Just running it normally)
+
 ```MLangExec Test.mlang -d``` (Running it, but seeing the debug output)
 
 # Learning 
 
-Go to the ```[Docs](docs)``` directory to see how to use MyLang
+Go to the [Docs](docs) directory to see how to use MyLang
