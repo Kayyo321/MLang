@@ -1,0 +1,3 @@
+LET str: "Hello World!"
+
+PRINT str
