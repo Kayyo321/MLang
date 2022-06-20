@@ -1,0 +1,3 @@
+C:/Users/sully/CLionProjects/Basic/Repo/cmake-build-debug/CMakeFiles/Basic.dir
+C:/Users/sully/CLionProjects/Basic/Repo/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/sully/CLionProjects/Basic/Repo/cmake-build-debug/CMakeFiles/rebuild_cache.dir
