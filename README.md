@@ -20,3 +20,8 @@ Why not?
 # Learning 
 
 Go to the [Docs](docs) directory to see how to use MyLang
+
+# Before && After
+
+![Code](ReadMeImg/Code.png)
+![Output](ReadMeImg/Output.png)
