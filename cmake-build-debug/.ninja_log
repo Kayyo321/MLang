@@ -1,20 +1,10 @@
 # ninja log v5
-28	880	6774622897005248	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
-0	1024	6774622898451318	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-49	1436	6774622902512820	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1436	1646	6774622904630449	Basic.exe	fded637503ef2db6
-0	9	0	clean	e4e5e35ff363ff4f
-7	616	6774623349256714	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
-2	733	6774623350417012	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-5	1059	6774623353662025	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1059	1251	6774623355579920	Basic.exe	fded637503ef2db6
 7	765	6774633693341031	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
-2	677	6774633811087899	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-677	871	6774633812990715	Basic.exe	fded637503ef2db6
 2	833	6774656984062134	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-6	1157	6774656987301578	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1158	1351	6774656989219566	Basic.exe	fded637503ef2db6
-2	1247	6774657893992125	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1247	1462	6774657896105946	Basic.exe	fded637503ef2db6
 3	1186	6774661477893675	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
 1186	1427	6774661480322982	Basic.exe	fded637503ef2db6
+0	9	0	clean	e4e5e35ff363ff4f
+8	676	6774706781177605	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
+2	843	6774706782841545	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
+6	1234	6774706786726592	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
+1234	1458	6774706788963938	Basic.exe	fded637503ef2db6
