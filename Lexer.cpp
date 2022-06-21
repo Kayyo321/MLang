@@ -1,6 +1,6 @@
 #include "Lexer.h"
 
-std::vector<Token> Lexer::Parse(const std::string &file, bool _isDebug)
+std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
 {
     isDebug = _isDebug;
 

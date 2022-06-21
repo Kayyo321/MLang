@@ -1,10 +1,16 @@
 # ninja log v5
-7	765	6774633693341031	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
-2	833	6774656984062134	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-3	1186	6774661477893675	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1186	1427	6774661480322982	Basic.exe	fded637503ef2db6
+5	644	6774716797683574	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
+2	210	6774717907923731	Basic.exe	fded637503ef2db6
+2	701	6774717678886511	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
+7	1142	6774716802652317	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
 0	9	0	clean	e4e5e35ff363ff4f
-8	676	6774706781177605	CMakeFiles/Basic.dir/Lexer.cpp.obj	781aa594cf098603
-2	843	6774706782841545	CMakeFiles/Basic.dir/main.cpp.obj	8e2023f77f5fca74
-6	1234	6774706786726592	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
-1234	1458	6774706788963938	Basic.exe	fded637503ef2db6
+8	385	6774716538114690	CMakeFiles/Basic.dir/BeauxExpressions/Token.cpp.obj	c5eac21ddd288502
+13	732	6774716798558600	CMakeFiles/Basic.dir/BeauxExpressions/Evaluator.cpp.obj	8a2128f5c4c21f1c
+0	101	6774718497315239	build.ninja	e857815cd15b40e2
+10	411	6774716795366308	CMakeFiles/Basic.dir/BeauxExpressions/Tok.cpp.obj	9bb01e1df0bbe016
+2	1222	6774721974922442	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
+1223	1483	6774721977403365	Basic.exe	fded637503ef2db6
+2	1039	6774723981175051	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
+1039	1239	6774723983163126	Basic.exe	fded637503ef2db6
+2	1199	6774725161618027	CMakeFiles/Basic.dir/Parser.cpp.obj	c74a4d21234d5903
+1200	1424	6774725163878319	Basic.exe	fded637503ef2db6

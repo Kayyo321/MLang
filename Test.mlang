@@ -13,16 +13,16 @@ var: *1.5
 PRINT "var is equal to " var "\n"
 
 //             / - (line of the ENDIF statement)
-IF 100 < 200 1800
+IF 100 < 200 180
     PRINT "Obviously\n"
 ENDIF
 
 LET i: 0
 
-IF i < 9 2600
+IF i < 10 260
     PRINT i "\n"
     i + 1
     GOTO 220
 ENDIF
 
-END
+END 0

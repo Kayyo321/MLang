@@ -14,8 +14,8 @@ class Variable;
 static std::map<std::string, std::string (*)()> strFunc;
 static std::map<std::string, Variable> variables;
 
-static std::vector<Token> tokens;
-static std::vector<Token> tokensOnLine;
+static std::vector<Tok> tokens;
+static std::vector<Tok> tokensOnLine;
 
 const static std::vector<std::string> Funcs
 {
@@ -51,14 +51,14 @@ class Parser
 public:
     Parser(bool);
 
-    void Parse(std::vector<Token>&);
+    void Parse(std::vector<Tok>&);
 
 private:
     void ParseLine();
     static void ParseID();
 
-    std::vector<Token>::iterator curToken;
-    std::vector<Token>::iterator endToken;
+    std::vector<Tok>::iterator curToken;
+    std::vector<Tok>::iterator endToken;
 };
 
 class Variable

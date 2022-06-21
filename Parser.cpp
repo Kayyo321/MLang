@@ -17,9 +17,9 @@ Parser::Parser(bool _isDebug)
     strFunc["END"] = &End;
 }
 
-std::vector<Token>::iterator setToken;
+std::vector<Tok>::iterator setToken;
 
-void Parser::Parse(std::vector<Token> &_tokens)
+void Parser::Parse(std::vector<Tok> &_tokens)
 {
     endToken = _tokens.end();
     curToken = _tokens.begin();
@@ -45,9 +45,12 @@ void Parser::Parse(std::vector<Token> &_tokens)
 
     if (isDebug)
     {
+        std::cout << "DEBUG\n\n";
+
         for (auto const &pair: variables)
         {
-            std::cout << pair.first << ", has the value of: " << pair.second.text << "\n";
+            std::cout << pair.first << ", has the value of: " << pair.second.text << "\n"
+                << pair.first << ", has the data-type of: " << TokenTypeStrings[pair.second.dataType] << "\n";
         }
     }
 }
@@ -71,7 +74,7 @@ void Parser::ParseID()
 {
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
-        const Token &tok {tokensOnLine[i]};
+        const Tok &tok {tokensOnLine[i]};
 
         if (tok.type == IDENTIFIER)
         {
@@ -111,7 +114,7 @@ std::string Print()
     {
         if (i == 0) continue;
 
-        const Token curToken {tokensOnLine[i]};
+        const Tok curToken {tokensOnLine[i]};
 
         if (curToken.type == IDENTIFIER)
         {
@@ -239,7 +242,7 @@ std::string If()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
-        const Token &curToken {tokensOnLine[i]};
+        const Tok &curToken {tokensOnLine[i]};
 
         switch (i)
         {
@@ -414,7 +417,7 @@ void Goto(size_t line)
 {
     bool foundLine {false};
 
-    for (const Token &tok: tokens)
+    for (const Tok &tok: tokens)
     {
         if (line == tok.lineNumber)
         {
@@ -505,7 +508,7 @@ std::string Goto()
 
     bool foundLine {false};
 
-    for (const Token &tok: tokens)
+    for (const Tok &tok: tokens)
     {
         if (line == tok.lineNumber)
         {
@@ -552,7 +555,53 @@ std::string Goto()
 }
 
 std::string End()
-{ exit(0); }
+{
+    double exitCode {};
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        switch (i)
+        {
+            case 0:
+                continue;
+
+            case 1:
+                if (tokensOnLine[1].type == INT
+                    || tokensOnLine[1].type == DOUBLE)
+                {
+                    exitCode = stoi(tokensOnLine[1].text);
+                }
+                else
+                {
+                    throw std::runtime_error
+                            (
+                                    std::string("GOTO needs an integer: ")
+                                    + tokensOnLine[i].text
+                                    + std::string(". (")
+                                    + std::to_string(tokensOnLine[i].lineNumber)
+                                    + std::string(", ")
+                                    + std::to_string(tokensOnLine[i].charIndex)
+                                    + std::string(").")
+                            );
+                }
+                break;
+
+            default:
+                throw std::runtime_error
+                        (
+                                std::string("Too many arguments: ")
+                                + tokensOnLine[i].text
+                                + std::string(". (")
+                                + std::to_string(tokensOnLine[i].lineNumber)
+                                + std::string(", ")
+                                + std::to_string(tokensOnLine[i].charIndex)
+                                + std::string(").")
+                        );
+        }
+    }
+
+    exit(exitCode);
+}
 
 bool CheckIf(const std::string &lhs, enum BoolOperator op, const std::string &rhs)
 {
@@ -705,7 +754,7 @@ signed long int Math()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
-        const Token &curToken {tokensOnLine[i]};
+        const Tok &curToken {tokensOnLine[i]};
 
         switch (i)
         {

@@ -33,7 +33,7 @@ const static char *TokenTypeStrings[]
     "EOL"
 };
 
-class Token
+class Tok
 {
 public:
     enum TokenType type;
