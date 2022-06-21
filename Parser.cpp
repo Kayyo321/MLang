@@ -556,7 +556,7 @@ std::string Goto()
 
 std::string End()
 {
-    double exitCode {};
+    double exitCode {0};
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
