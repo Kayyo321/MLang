@@ -91,7 +91,7 @@ std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
                     curToken.type = DOUBLE;
                     curToken.text += c;
                 }
-                else if (curToken.type == INT)
+                else if (curToken.type == STRING)
                 {
                     curToken.text += c;
                 }

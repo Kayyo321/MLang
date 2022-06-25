@@ -57,4 +57,12 @@ IF o < 5 580
     GOTO 540
 ENDIF
 
+PRINT "\n--== PORTION/RELEASE EXAMPLE ==--\n\n"
+
+PORTION TEST > "/Users/karinebac/CLionProjects/MLANG/Test1.mlang"
+
+RELEASE TEST
+
+PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
+
 END 0

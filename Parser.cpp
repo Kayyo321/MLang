@@ -14,6 +14,8 @@ Parser::Parser(bool _isDebug)
     strFunc["ENDIF"] = &EndIf;
     strFunc["GOTO"] = &Goto;
     strFunc["END"] = &End;
+    strFunc["PORTION"] = &Portion;
+    strFunc["RELEASE"] = &Release;
 }
 
 std::vector<Tok>::iterator setToken;
@@ -801,19 +803,151 @@ std::string End()
 
             default:
                 throw std::runtime_error
-                        (
-                                std::string("Too many arguments: ")
-                                + tokensOnLine[i].text
-                                + std::string(". (")
-                                + std::to_string(tokensOnLine[i].lineNumber)
-                                + std::string(", ")
-                                + std::to_string(tokensOnLine[i].charIndex)
-                                + std::string(").")
-                        );
+                (
+                    std::string("Too many arguments: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
         }
     }
 
     exit(exitCode);
+}
+
+std::string Portion()
+{
+    std::string ref {}, path {};
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Tok &token {tokensOnLine[i]};
+
+        switch (i)
+        {
+            case 0:
+                continue;
+
+            case 1:
+                if (token.type == IDENTIFIER)
+                {
+                    ref = token.text;
+
+                    continue;
+                }
+
+                throw std::runtime_error
+                (
+                    std::string("Unexpected token: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+
+            case 2:
+                if (token.type == OPERATOR
+                    && token.text == ">")
+                {
+                    continue;
+                }
+
+                throw std::runtime_error
+                (
+                    std::string("Unexpected token: ")
+                    + tokensOnLine[i].text
+                    + std::string(". Expected an operator: '>' (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+
+            case 3:
+                if (token.type == STRING)
+                {
+                    path = token.text;
+
+                    continue;
+                }
+
+                throw std::runtime_error
+                (
+                    std::string("Unexpected token: ")
+                    + tokensOnLine[i].text
+                    + std::string(". Expected a string (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+        }
+    }
+
+    std::ifstream file {path};
+    std::string contents
+    {
+        (std::istreambuf_iterator<char>(file)),
+        std::istreambuf_iterator<char>()
+    };
+
+    Lexer lexer {};
+
+    const std::vector<Tok> port {lexer.Parse(contents, isDebug)};
+
+    portions[ref] = port;
+
+    return {};
+}
+
+std::string Release()
+{
+    if (tokensOnLine.size() < 2 || tokensOnLine.size() > 2)
+    {
+        throw std::runtime_error
+        (
+            std::string("Incorrect argument count: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(tokensOnLine[0].lineNumber)
+            + std::string(", ")
+            + std::to_string(tokensOnLine[0].charIndex)
+            + std::string(").")
+        );
+    }
+
+    std::string ref {};
+
+    if (tokensOnLine[1].type == IDENTIFIER)
+    {
+        ref = tokensOnLine[1].text;
+    }
+
+    if (IsPort(ref))
+    {
+        Parser parser {isDebug};
+        parser.Parse(portions[ref]);
+    }
+    else
+    {
+        throw std::runtime_error
+        (
+            std::string("Portion not found: ")
+            + ref
+            + std::string(". (")
+            + std::to_string(tokensOnLine[1].lineNumber)
+            + std::string(", ")
+            + std::to_string(tokensOnLine[1].charIndex)
+            + std::string(").")
+        );
+    }
+
+    return {};
 }
 
 bool CheckIf(const std::string &lhs, enum BoolOperator op, const std::string &rhs)
@@ -875,6 +1009,17 @@ bool IsArr(const std::string &value)
 {
     auto it {arrays.find(value)};
     if (it != arrays.end())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool IsPort(const std::string &value)
+{
+    auto it {portions.find(value)};
+    if (it != portions.end())
     {
         return true;
     }
