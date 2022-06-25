@@ -23,7 +23,8 @@ Go to the [Docs](docs) directory to see how to use MyLang
 
 # Before && After
 
-```PRINT "\n\n--== PRINT EXAMPLE ==--\n\n"
+```
+PRINT "\n\n--== PRINT EXAMPLE ==--\n\n"
 
 PRINT "Hello World!"
 
@@ -90,6 +91,7 @@ RELEASE TEST
 
 PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
 
-END 0```
+END 0
+```
 
-![Console](ReadMeImg/Console.png)
+![Output](ReadMeImg/Output.png)
