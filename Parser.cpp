@@ -46,13 +46,45 @@ void Parser::Parse(std::vector<Tok> &_tokens)
 
     if (isDebug)
     {
-        std::cout << "DEBUG\n\n";
+        std::cout << "DEBUG FINISHING OUTPUT\n\n";
 
-        for (auto const &pair: variables)
+        for (const auto &pair: variables)
         {
-            std::cout << pair.first << ", has the value of: " << pair.second.text << "\n"
-                << pair.first << ", has the data-type of: " << TokenTypeStrings[pair.second.dataType] << "\n";
+            std::cout
+                << pair.first
+                << ", has the value of: "
+                << pair.second.text
+                << "\n"
+                << pair.first
+                << ", has the data-type of: "
+                << TokenTypeStrings[pair.second.dataType]
+                << "\n\n";
         }
+
+        for (const auto &pair: arrays)
+        {
+            std::cout
+                << "Array: \""
+                << pair.first
+                << "\": {\n";
+
+            for (const Tok &token: pair.second.children)
+            {
+                std::cout
+                    << "\t"
+                    << token.text
+                    << "\n";
+            }
+
+            std::cout << "}\n\n";
+        }
+
+        for (const auto &pair: portions)
+        {
+            std::cout << "Portion: " << pair.first << "\n";
+        }
+
+        std::cout << "\nMLANG DEBUG ENDING...";
     }
 }
 
