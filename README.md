@@ -92,4 +92,4 @@ PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
 
 END 0```
 
-![Output](ReadMeImg/Console.png)
+![Console](ReadMeImg/Console.png)
