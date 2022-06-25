@@ -2,11 +2,11 @@
 
 A BASIC styled language
 
-# Why
+## Why
 
 Why not?
 
-# How to use
+## How to use
 
 1. I'm use CLion so I just add the ```.mlang``` to the Program arguments
 2. If you are compiling through the command line...
@@ -17,11 +17,13 @@ Why not?
 
 ```MLangExec Test.mlang -d``` (Running it, but seeing the debug output)
 
-# Learning 
+## Learning 
 
 Go to the [Docs](docs) directory to see how to use MyLang
 
-# Before && After
+## Before && After
+
+#### **(Test.mlang)**
 
 ```
 PRINT "\n\n--== PRINT EXAMPLE ==--\n\n"
