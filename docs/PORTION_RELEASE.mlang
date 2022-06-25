@@ -1,0 +1,14 @@
+// Portioning grabs all the tokens from one mlang file, and stores them.
+// Once released, they will be parsed; kind of like a function/method.
+// Portions are stored in variables, and are used with the PORTION keyword:
+// PORTION [Portion-name] > [Path-to-mlang-file]
+
+PORTION TEST > "../Test1.mlang"
+
+// Portioning an mlang file does not parse them immediately.
+// To parse the tokens, you use the RELEASE keyword:
+// RELEASE [Portion-name]
+
+RELEASE TEST
+
+// Will print: "(From Test1.mlang) I have been released!"

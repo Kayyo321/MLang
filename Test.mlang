@@ -59,7 +59,7 @@ ENDIF
 
 PRINT "\n--== PORTION/RELEASE EXAMPLE ==--\n\n"
 
-PORTION TEST > "/Users/karinebac/CLionProjects/MLANG/Test1.mlang"
+PORTION TEST > "../Test1.mlang"
 
 RELEASE TEST
 
