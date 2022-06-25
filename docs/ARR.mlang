@@ -1,0 +1,22 @@
+// Arrays are defined using the ARR keyword, structure is as follows:
+// ARR [Array-name] : [Array-elements]
+// An array data-type is defined by the first element in the array.
+
+ARR a: 10 20 30 40 50
+
+LET b: 0
+
+IF b < 5 360
+
+    // To get the index of an array, the structure is as follows:
+    // [Array-name] [Array-index]
+
+    PRINT a b " - a [" b "]\n"
+    b + 1
+    GOTO 320
+ENDIF
+
+// To re-assign an array element, the structure is as follows:
+// [Array-name] [Array-index] : [New-array-value]
+
+a 4: 60

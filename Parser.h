@@ -10,17 +10,23 @@
 #include "Token.h"
 
 class Variable;
+class Array;
 
 static std::map<std::string, std::string (*)()> strFunc;
 static std::map<std::string, Variable> variables;
+static std::map<std::string, Array> arrays;
 
 static std::vector<Tok> tokens;
 static std::vector<Tok> tokensOnLine;
+
+static std::vector<std::string> scopeVars;
+static std::vector<std::string> scopeArrs;
 
 const static std::vector<std::string> Funcs
 {
     "PRINT",
     "LET",
+    "ARR",
     "IF",
     "ENDIF",
     "GOTO",
@@ -69,8 +75,19 @@ public:
     size_t lineNumber {1}, charIndex {1};
 };
 
+class Array
+{
+public:
+    enum TokenType dataType;
+    std::string name;
+    size_t lineNumber {1}, charIndex {1};
+
+    std::vector<Tok> children;
+};
+
 std::string Print();
 std::string Let();
+std::string Arr();
 std::string If();
 std::string EndIf();
 std::string Goto();
@@ -78,6 +95,7 @@ std::string End();
 
 void Goto(size_t);
 void ReAssignVar();
+void ReAssignArr();
 
 signed long int Math();
 
@@ -87,3 +105,4 @@ bool CheckIf(const std::string&,
 
 bool InArray(const std::string &value, const std::vector<std::string> &array);
 bool IsVar(const std::string &value);
+bool IsArr(const std::string &value);

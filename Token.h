@@ -15,7 +15,8 @@ enum TokenType
     SES,
     MAYBE_COMMENT,
     COMMENT,
-    EOL
+    EOL,
+    NULL_VAL
 };
 
 const static char *TokenTypeStrings[]

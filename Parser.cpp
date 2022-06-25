@@ -3,14 +3,13 @@
 bool isGoto {false};
 bool isIf {false};
 
-std::vector<std::string> scopeVars;
-
 Parser::Parser(bool _isDebug)
 {
     isDebug = _isDebug;
 
     strFunc["PRINT"] = &Print;
     strFunc["LET"] = &Let;
+    strFunc["ARR"] = &Arr;
     strFunc["IF"] = &If;
     strFunc["ENDIF"] = &EndIf;
     strFunc["GOTO"] = &Goto;
@@ -104,6 +103,11 @@ void Parser::ParseID()
                 }
                 break;
             }
+
+            if (IsArr(tok.text))
+            {
+                ReAssignArr();
+            }
         }
     }
 }
@@ -130,6 +134,44 @@ std::string Print()
             if (IsVar(curToken.text))
             {
                 std::cout << variables[curToken.text].text;
+
+                continue;
+            }
+
+            if (IsArr(curToken.text))
+            {
+                if (tokensOnLine[i + 1].type == INT)
+                {
+                    int index {std::stoi(tokensOnLine[i + 1].text)};
+
+                    std::cout << arrays[curToken.text].children[index].text;
+
+                    ++i;
+                }
+                else if (IsVar(tokensOnLine[i + 1].text))
+                {
+                    if (variables[tokensOnLine[i + 1].text].dataType == INT)
+                    {
+                        int index {std::stoi(variables[tokensOnLine[i + 1].text].text)};
+
+                        std::cout << arrays[curToken.text].children[std::stoi(variables[tokensOnLine[i + 1].text].text)].text;
+
+                        ++i;
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Index should be integer: ")
+                        + tokensOnLine[i + 1].text
+                        + std::string(". (")
+                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::string(", ")
+                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::string(").")
+                    );
+                }
 
                 continue;
             }
@@ -228,6 +270,166 @@ std::string Let()
 
     if (isIf)
         scopeVars.push_back(x.name);
+
+    return {};
+}
+
+std::string Arr()
+{
+    Array x;
+    x.dataType = NULL_VAL;
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Tok &token {tokensOnLine[i]};
+
+        if (i == 0)
+            continue;
+
+        if (i == 1)
+        {
+            if (tokensOnLine[1].type == IDENTIFIER)
+            {
+                x.name = token.text;
+                continue;
+            }
+            else
+            {
+                throw std::runtime_error
+                (
+                    std::string("Unknown variable name: ")
+                    + tokensOnLine[1].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[1].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[1].charIndex)
+                    + std::string(").")
+                );
+            }
+        }
+
+        if (i == 2)
+        {
+            if (tokensOnLine[2].type == OPERATOR
+                && tokensOnLine[2].text == ":")
+            {
+                continue;
+            }
+            else
+            {
+                throw std::runtime_error
+                (
+                    std::string("Unknown operator: ")
+                    + tokensOnLine[i].text
+                    + std::string(". Expected ':' (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+            }
+        }
+
+        if (i >= 3)
+        {
+            if (token.type != EOL)
+            {
+                if (x.dataType == NULL_VAL)
+                {
+                    if (token.type == IDENTIFIER)
+                    {
+                        if (IsVar(token.text))
+                        {
+                            x.dataType = variables[token.text].dataType;
+                            x.children.push_back(token);
+
+                            continue;
+                        }
+
+                        throw std::runtime_error
+                        (
+                            std::string("Unknown identifier: ")
+                            + tokensOnLine[i].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+                    else
+                    {
+                        x.dataType = token.type;
+                        x.children.push_back(token);
+                    }
+                }
+                else
+                {
+                    if (token.type == IDENTIFIER)
+                    {
+                        if (IsVar(token.text))
+                        {
+                            if (x.dataType != variables[token.text].dataType)
+                            {
+                                throw std::runtime_error
+                                (
+                                    std::string("Unexpected data-type: ")
+                                    + tokensOnLine[i].text
+                                    + std::string(". (")
+                                    + std::to_string(tokensOnLine[i].lineNumber)
+                                    + std::string(", ")
+                                    + std::to_string(tokensOnLine[i].charIndex)
+                                    + std::string(").")
+                                );
+                            }
+
+                            x.children.push_back(token);
+
+                            continue;
+                        }
+
+                        throw std::runtime_error
+                        (
+                            std::string("Unknown identifier: ")
+                            + tokensOnLine[i].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+                    else
+                    {
+                        if (x.dataType != token.type)
+                        {
+                            throw std::runtime_error
+                            (
+                                std::string("Unexpected data-type: (")
+                                + tokensOnLine[i].text
+                                + std::string(", ")
+                                + TokenTypeStrings[tokensOnLine[i].type]
+                                + std::string(") against: (")
+                                + TokenTypeStrings[x.dataType]
+                                + std::string("). (")
+                                + std::to_string(tokensOnLine[i].lineNumber)
+                                + std::string(", ")
+                                + std::to_string(tokensOnLine[i].charIndex)
+                                + std::string(").")
+                            );
+                        }
+
+                        x.children.push_back(token);
+                    }
+                }
+            }
+        }
+    }
+
+    arrays[x.name] = x;
+
+    if (isIf)
+        scopeArrs.push_back(x.name);
 
     return {};
 }
@@ -406,6 +608,17 @@ std::string EndIf()
             if (IsVar(s))
             {
                 variables.erase(s);
+            }
+        }
+    }
+
+    if (!scopeArrs.empty())
+    {
+        for (const std::string &s: scopeArrs)
+        {
+            if (IsArr(s))
+            {
+                arrays.erase(s);
             }
         }
     }
@@ -658,6 +871,17 @@ bool IsVar(const std::string &value)
     return false;
 }
 
+bool IsArr(const std::string &value)
+{
+    auto it {arrays.find(value)};
+    if (it != arrays.end())
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void ReAssignVar()
 {
     std::string var;
@@ -697,7 +921,8 @@ void ReAssignVar()
                 }
                 else if (tokensOnLine[2].type == variables[var].dataType)
                 {
-                    variables[var].text = tokensOnLine[2].text;
+                    const std::string &token {tokensOnLine[2].text};
+                    variables[var].text = token;
                 }
                 else
                 {
@@ -712,6 +937,149 @@ void ReAssignVar()
                         + std::string(").")
                     );
                 }
+                break;
+        }
+    }
+}
+
+void ReAssignArr()
+{
+    std::string arr {};
+    TokenType arrType {WHITESPACE};
+    int index {};
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Tok &token {tokensOnLine[i]};
+
+        switch (i)
+        {
+            case 0:
+                if (IsArr(token.text))
+                {
+                    arr = token.text;
+
+                    arrType = arrays[token.text].dataType;
+                }
+                else
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Could not find array: ")
+                        + token.text
+                        + std::string(". (")
+                        + std::to_string(token.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(token.charIndex)
+                        + std::string(").")
+                    );
+                }
+                break;
+
+            case 1:
+                if (token.type == INT)
+                {
+                    index = std::stoi(token.text);
+                }
+                else if (token.type == IDENTIFIER)
+                {
+                    if (IsVar(token.text))
+                    {
+                        if (arrType == variables[token.text].dataType)
+                        {
+                            index = std::stoi(variables[token.text].text);
+                        }
+                        else
+                        {
+                            throw std::runtime_error
+                            (
+                                std::string("Unexpected token: ")
+                                + token.text
+                                + std::string(". expected integer to find index (")
+                                + std::to_string(token.lineNumber)
+                                + std::string(", ")
+                                + std::to_string(token.charIndex)
+                                + std::string(").")
+                            );
+                        }
+                    }
+                }
+                break;
+
+            case 2:
+                if (token.type != OPERATOR
+                    || token.text != ":")
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Unexpected token: ")
+                        + token.text
+                        + std::string(". (")
+                        + std::to_string(token.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(token .charIndex)
+                        + std::string(").")
+                    );
+                }
+                break;
+
+            case 3:
+                if (token.type == IDENTIFIER)
+                {
+                    if (IsVar(token.text))
+                    {
+                        if (arrType == variables[token.text].dataType)
+                        {
+                            arrays[arr].children[index].text = variables[token.text].text;
+                        }
+                        else
+                        {
+                            throw std::runtime_error
+                            (
+                                std::string("Unexpected token: ")
+                                + token.text
+                                + std::string(". expected an integer (")
+                                + std::to_string(token.lineNumber)
+                                + std::string(", ")
+                                + std::to_string(token.charIndex)
+                                + std::string(").")
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    if (arrType == token.type)
+                    {
+                        arrays[arr].children[index].text = token.text;
+                    }
+                    else
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Type miss-match: ")
+                            + token.text
+                            + std::string(". (")
+                            + std::to_string(token.lineNumber)
+                            + std::string(", ")
+                            + std::to_string(token .charIndex)
+                            + std::string(").")
+                        );
+                    }
+                }
+                break;
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments in array re-assign: ")
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(token.charIndex)
+                    + std::string(").")
+                );
                 break;
         }
     }
