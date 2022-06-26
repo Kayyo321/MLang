@@ -26,18 +26,7 @@ static std::vector<std::string> scopeVars;
 
 static std::vector<std::string> scopeArrs;
 
-const static std::vector<std::string> Funcs
-{
-    "PRINT",
-    "LET",
-    "ARR",
-    "IF",
-    "ENDIF",
-    "GOTO",
-    "END",
-    "PORTION",
-    "RELEASE"
-};
+static std::vector<std::string> Funcs;
 
 static bool isDebug {false};
 
@@ -61,7 +50,7 @@ enum Operator
 class Parser
 {
 public:
-    Parser(bool);
+    explicit Parser(bool);
 
     void Parse(std::vector<Tok>&);
 
@@ -78,7 +67,6 @@ class Variable
 public:
     enum TokenType dataType;
     std::string name, text;
-    size_t lineNumber {1}, charIndex {1};
 };
 
 class Array
@@ -86,7 +74,6 @@ class Array
 public:
     enum TokenType dataType;
     std::string name;
-    size_t lineNumber {1}, charIndex {1};
 
     std::vector<Tok> children;
 };

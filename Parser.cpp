@@ -16,6 +16,16 @@ Parser::Parser(bool _isDebug)
     strFunc["END"] = &End;
     strFunc["PORTION"] = &Portion;
     strFunc["RELEASE"] = &Release;
+
+    Funcs.emplace_back("PRINT");
+    Funcs.emplace_back("LET");
+    Funcs.emplace_back("ARR");
+    Funcs.emplace_back("IF");
+    Funcs.emplace_back("ENDIF");
+    Funcs.emplace_back("GOTO");
+    Funcs.emplace_back("END");
+    Funcs.emplace_back("PORTION");
+    Funcs.emplace_back("RELEASE");
 }
 
 std::vector<Tok>::iterator setToken;
@@ -188,7 +198,7 @@ std::string Print()
                     {
                         int index {std::stoi(variables[tokensOnLine[i + 1].text].text)};
 
-                        std::cout << arrays[curToken.text].children[std::stoi(variables[tokensOnLine[i + 1].text].text)].text;
+                        std::cout << arrays[curToken.text].children[index].text;
 
                         ++i;
                     }
@@ -614,6 +624,18 @@ std::string If()
                     );
                 }
                 break;
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
         }
     }
 
@@ -803,7 +825,7 @@ std::string Goto()
 
 std::string End()
 {
-    double exitCode {0};
+    int exitCode {0};
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
@@ -913,6 +935,18 @@ std::string Portion()
                     std::string("Unexpected token: ")
                     + tokensOnLine[i].text
                     + std::string(". Expected a string (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
                     + std::to_string(tokensOnLine[i].lineNumber)
                     + std::string(", ")
                     + std::to_string(tokensOnLine[i].charIndex)
@@ -1095,26 +1129,47 @@ void ReAssignVar()
                     /* Changing data-type */
                     variables[var].dataType = tokensOnLine[3].type;
                     variables[var].text = tokensOnLine[3].text;
+
+                    continue;
                 }
                 else if (tokensOnLine[2].type == variables[var].dataType)
                 {
                     const std::string &token {tokensOnLine[2].text};
                     variables[var].text = token;
+
+                    continue;
                 }
-                else
+
+                throw std::runtime_error
+                (
+                    std::string("Type miss-match: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
+
+            case 3:
+                if (tokensOnLine[3].type == variables[var].dataType)
                 {
-                    throw std::runtime_error
-                    (
-                        std::string("Type miss-match: ")
-                        + tokensOnLine[i].text
-                        + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
-                        + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
-                        + std::string(").")
-                    );
+                    const std::string &token {tokensOnLine[3].text};
+                    variables[var].text = token;
                 }
                 break;
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
         }
     }
 }
@@ -1137,21 +1192,20 @@ void ReAssignArr()
                     arr = token.text;
 
                     arrType = arrays[token.text].dataType;
+
+                    continue;
                 }
-                else
-                {
-                    throw std::runtime_error
-                    (
-                        std::string("Could not find array: ")
-                        + token.text
-                        + std::string(". (")
-                        + std::to_string(token.lineNumber)
-                        + std::string(", ")
-                        + std::to_string(token.charIndex)
-                        + std::string(").")
-                    );
-                }
-                break;
+
+                throw std::runtime_error
+                (
+                    std::string("Could not find array: ")
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(token.charIndex)
+                    + std::string(").")
+                );
 
             case 1:
                 if (token.type == INT)
@@ -1165,20 +1219,20 @@ void ReAssignArr()
                         if (arrType == variables[token.text].dataType)
                         {
                             index = std::stoi(variables[token.text].text);
+
+                            continue;
                         }
-                        else
-                        {
-                            throw std::runtime_error
-                            (
-                                std::string("Unexpected token: ")
-                                + token.text
-                                + std::string(". expected integer to find index (")
-                                + std::to_string(token.lineNumber)
-                                + std::string(", ")
-                                + std::to_string(token.charIndex)
-                                + std::string(").")
-                            );
-                        }
+
+                        throw std::runtime_error
+                        (
+                            std::string("Unexpected token: ")
+                            + token.text
+                            + std::string(". expected integer to find index (")
+                            + std::to_string(token.lineNumber)
+                            + std::string(", ")
+                            + std::to_string(token.charIndex)
+                            + std::string(").")
+                        );
                     }
                 }
                 break;
@@ -1257,7 +1311,6 @@ void ReAssignArr()
                     + std::to_string(token.charIndex)
                     + std::string(").")
                 );
-                break;
         }
     }
 }
@@ -1414,6 +1467,18 @@ signed long int Math()
                     rhs = curToken.text;
                 }
                 break;
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments: ")
+                    + tokensOnLine[i].text
+                    + std::string(". (")
+                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::string(", ")
+                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::string(").")
+                );
         }
     }
 

@@ -49,8 +49,8 @@ cmake_ninja_workdir = /Users/karinebac/CLionProjects/MLANG/cmake-build-debug/
 
 build cmake_object_order_depends_target_Basic: phony || CMakeFiles/Basic.dir
 
-build CMakeFiles/Basic.dir/main.cpp.o: CXX_COMPILER__Basic_Debug /Users/karinebac/CLionProjects/MLANG/main.cpp || cmake_object_order_depends_target_Basic
-  DEP_FILE = CMakeFiles/Basic.dir/main.cpp.o.d
+build CMakeFiles/Basic.dir/Main.cpp.o: CXX_COMPILER__Basic_Debug /Users/karinebac/CLionProjects/MLANG/Main.cpp || cmake_object_order_depends_target_Basic
+  DEP_FILE = CMakeFiles/Basic.dir/Main.cpp.o.d
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk -std=gnu++2a
   OBJECT_DIR = CMakeFiles/Basic.dir
   OBJECT_FILE_DIR = CMakeFiles/Basic.dir
@@ -75,7 +75,7 @@ build CMakeFiles/Basic.dir/Parser.cpp.o: CXX_COMPILER__Basic_Debug /Users/karine
 #############################################
 # Link the executable Basic
 
-build Basic: CXX_EXECUTABLE_LINKER__Basic_Debug CMakeFiles/Basic.dir/main.cpp.o CMakeFiles/Basic.dir/Lexer.cpp.o CMakeFiles/Basic.dir/Parser.cpp.o
+build Basic: CXX_EXECUTABLE_LINKER__Basic_Debug CMakeFiles/Basic.dir/Main.cpp.o CMakeFiles/Basic.dir/Lexer.cpp.o CMakeFiles/Basic.dir/Parser.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk
   OBJECT_DIR = CMakeFiles/Basic.dir
   POST_BUILD = :

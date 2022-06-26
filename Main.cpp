@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <fstream>
 
 #include "Token.h"
 #include "Lexer.h"
@@ -44,18 +43,20 @@ int main(int argc, char **argv)
     if (debug)
         std::cout << "FILE:\n{\n\n" << contents << "\n\n}\n";
 
-    Lexer lexer {};
+    Lexer *lexer {new Lexer {}};
 
-    std::vector<Tok> tokens {lexer.Parse(contents, debug)};
+    std::vector<Tok> lexedTokens {lexer->Parse(contents, debug)};
+
+    delete lexer;
 
     if (debug)
-        std::cout << "\n" << tokens.size() << " tokens found:\n{\n\n";
+        std::cout << "\n" << lexedTokens.size() << " lexedTokens found:\n{\n\n";
 
     if (debug)
     {
-        for (size_t i {0}; i < tokens.size(); ++i)
+        for (size_t i {0}; i < lexedTokens.size(); ++i)
         {
-            if (tokens[i].type == EOL)
+            if (lexedTokens[i].type == EOL)
             {
                 std::cout << "\n\tNEWLINE\n\n";
 
@@ -64,32 +65,34 @@ int main(int argc, char **argv)
 
             std::cout
                     << "\t"
-                    << TokenTypeStrings[tokens[i].type]
+                    << TokenTypeStrings[lexedTokens[i].type]
                     << ": \""
-                    << tokens[i].text
+                    << lexedTokens[i].text
                     << "\", ("
-                    << tokens[i].lineNumber
+                    << lexedTokens[i].lineNumber
                     << ", "
-                    << tokens[i].charIndex
+                    << lexedTokens[i].charIndex
                     << ");\n";
         }
 
         std::cout << "\n}\n";
     }
 
-    Parser parser {debug};
+    Parser *parser {new Parser{debug}};
 
     if (debug)
         std::cout << "Output: \n{\n\n";
 
     try
     {
-        parser.Parse(tokens);
+        parser->Parse(lexedTokens);
     }
     catch (const std::runtime_error &e)
     {
         std::cerr << "Parser error occurred: \n\t" << e.what() << "\n";
     }
+
+    delete parser;
 
     if (debug)
         std::cout << "\n\n}\n";

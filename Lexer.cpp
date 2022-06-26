@@ -44,7 +44,6 @@ std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
                         << curToken.lineNumber << ", " << curToken.charIndex << ").\n";
 
                     exit(1);
-                    break;
             }
 
             curToken.type = STRING;
