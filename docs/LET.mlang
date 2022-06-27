@@ -15,3 +15,12 @@ var: 200 // still an integer
 var: *1.5 // double
 
 // Now the variable 'var' is a double, and is '1.5'.
+
+// Constant variables are read-only; they can be initialized,
+// and that will be their one and only value:
+// LET $ [Var-name] : [Value]
+
+LET $const: 20
+
+// When re-assigning a constant variable, you will get an error:
+// const: 30
