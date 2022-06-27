@@ -79,6 +79,7 @@ std::string Goto();
 std::string End();
 std::string Portion();
 std::string Release();
+std::string Append();
 
 void Goto(size_t);
 void ReAssignVar();

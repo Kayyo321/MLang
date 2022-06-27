@@ -90,6 +90,18 @@ IF o < 5 580
     GOTO 540
 ENDIF
 
+PRINT "\n--== APPEND ARRAY EXAMPLE ==--\n\n"
+
+APPEND a 70
+
+o: 0
+
+IF o < 6 700
+    PRINT a o " - a [" o "]\n"
+    o: TE_MATH "{o} + 1"
+    GOTO 660
+ENDIF
+
 PRINT "\n--== PORTION/RELEASE EXAMPLE ==--\n\n"
 
 PORTION TEST > "../PortionedCode.mlang"

@@ -16,6 +16,7 @@ Parser::Parser(bool _isDebug)
     strFunc["END"] = &End;
     strFunc["PORTION"] = &Portion;
     strFunc["RELEASE"] = &Release;
+    strFunc["APPEND"] = &Append;
 
     Funcs.emplace_back("PRINT");
     Funcs.emplace_back("LET");
@@ -26,6 +27,7 @@ Parser::Parser(bool _isDebug)
     Funcs.emplace_back("END");
     Funcs.emplace_back("PORTION");
     Funcs.emplace_back("RELEASE");
+    Funcs.emplace_back("APPEND");
 }
 
 std::vector<Tok>::iterator setToken;
@@ -329,7 +331,7 @@ std::string Let()
                     if (token.text == "TE_MATH")
                     {
                         std::string toks {tokensOnLine[4].text};
-                        toks = GetVarsInStr(toks.c_str());
+                        toks = GetVarsInStr(toks);
                         long double val {Math(toks.c_str())};
 
                         if (IsWhole(val))
@@ -1107,6 +1109,136 @@ std::string Release()
     return {};
 }
 
+std::string Append()
+{
+    std::string arrName {};
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Tok &token {tokensOnLine[i]};
+
+        switch (i)
+        {
+            case 0: // Do nothing
+                break;
+
+            case 1:
+                if (IsArr(token.text))
+                {
+                    arrName = token.text;
+
+                    continue;
+                }
+
+                throw std::runtime_error
+                (
+                    std::string("Couldn't find array: ")
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(token.charIndex)
+                    + std::string(").")
+                );
+
+            case 2:
+            {
+                Tok tok {};
+                tok.lineNumber = token.lineNumber;
+                tok.charIndex = token.charIndex;
+
+                if (token.type == IDENTIFIER)
+                {
+                    if (token.text == "TE_MATH")
+                    {
+                        std::string toks {token.text};
+                        toks = GetVarsInStr(toks);
+                        long double val {Math(toks.c_str())};
+
+                        if (IsWhole(val) && arrays[arrName].dataType == INT)
+                        {
+                            tok.text = std::to_string((int)val);
+                            tok.type = INT;
+
+                            arrays[arrName].children.push_back(tok);
+                        }
+                        else
+                        {
+                            tok.text = std::to_string((double)val);
+                            tok.type = DOUBLE;
+
+                            arrays[arrName].children.emplace_back(tok);
+                        }
+
+                        ++i;
+                    }
+                    else if (IsVar(token.text))
+                    {
+                        if (variables[token.text].dataType == arrays[arrName].dataType)
+                        {
+                            tok.type = arrays[arrName].dataType;
+                            tok.text = variables[token.text].text;
+
+                            arrays[arrName].children.emplace_back(tok);
+                        }
+                    }
+                    else
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Unexpected identifier: ")
+                            + tokensOnLine[i].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+                }
+                else
+                {
+                    if (arrays[arrName].dataType == token.type)
+                    {
+                        tok.type = token.type;
+                        tok.text = token.text;
+
+                        arrays[arrName].children.emplace_back(tok);
+                    }
+                    else
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Array type miss-match: ")
+                            + tokensOnLine[i].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+                }
+            }
+                break;
+
+            default:
+                throw std::runtime_error
+                (
+                    std::string("Too many arguments: ")
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(token.charIndex)
+                    + std::string(").")
+                );
+        }
+    }
+
+    return {};
+}
+
 bool CheckIf(const std::string &lhs, enum BoolOperator op, const std::string &rhs)
 {
     bool ret {false};
@@ -1245,7 +1377,7 @@ void ReAssignVar()
                     if (tokensOnLine[2].text == "TE_MATH")
                     {
                         std::string toks {tokensOnLine[3].text};
-                        toks = GetVarsInStr(toks.c_str());
+                        toks = GetVarsInStr(toks);
                         long double val {Math(toks.c_str())};
 
                         if (IsWhole(val))
@@ -1385,7 +1517,7 @@ void ReAssignArr()
                     if (token.text == "TE_MATH")
                     {
                         std::string toks {tokensOnLine[4].text};
-                        toks = GetVarsInStr(toks.c_str());
+                        toks = GetVarsInStr(toks);
                         long double val {Math(toks.c_str())};
 
                         if (IsWhole(val))
@@ -1548,8 +1680,8 @@ std::string GetVarsInStr(std::string str)
 
                     if (std::isdigit(delim[2]))
                     {
-                        const std::string i {delim[2]};
-                        index = std::stoi(i);
+                        const std::string in {delim[2]};
+                        index = std::stoi(in);
                     }
                     else if (IsVar(varName)
                              && variables[varName].dataType == INT)

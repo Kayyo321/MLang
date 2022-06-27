@@ -20,3 +20,8 @@ ENDIF
 // [Array-name] [Array-index] : [New-array-value]
 
 a 4: 60
+
+// To append to an array, you use the APPEND keyword, which is used as follows:
+// APPEND [Array-name] [New-element]
+
+APPEND a 70
