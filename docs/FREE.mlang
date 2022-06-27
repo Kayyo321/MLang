@@ -1,0 +1,22 @@
+// The FREE keyword is used to get rid of variables.
+// Once used, that variable is erased, and can no longer be used.
+// Here's how to use it:
+
+LET x: 123
+
+FREE x
+
+// The FREE_ARR keyword is similar to the FREE keyword,
+// but it is used to delete arrays:
+
+ARR a: 1 2 3 4 5
+
+FREE_ARR a
+
+// The FREE_PORTION keyword deletes a portion,
+// meaning you can no longer call it in a
+// RELEASE statement:
+
+PORTION port > "A_File_Path"
+
+FREE_PORTION port

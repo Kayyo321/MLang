@@ -82,6 +82,9 @@ std::string End();
 std::string Portion();
 std::string Release();
 std::string Append();
+std::string Free();
+std::string FreeArr();
+std::string FreePort();
 
 void Goto(size_t);
 void ReAssignVar();

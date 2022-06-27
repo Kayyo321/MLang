@@ -62,7 +62,7 @@ For log = natural log uncomment the next line. */
 /* #define TE_NAT_LOG */
 
 // builtin functions
-[[nodiscard]] constexpr static double _equal(double a, double b) noexcept { return (a == b) ? 1 : 0; }
+[[nodiscard]] constexpr static double equal(double a, double b) noexcept { return (a == b) ? 1 : 0; }
 [[nodiscard]] constexpr static double _not_equal(double a, double b) noexcept { return (a != b) ? 1 : 0; }
 [[nodiscard]] constexpr static double _less_than(double a, double b) noexcept { return (a < b) ? 1 : 0; }
 [[nodiscard]] constexpr static double _less_than_equal_to(double a, double b) noexcept { return (a <= b) ? 1 : 0; }
@@ -437,7 +437,7 @@ void te_parser::next_token(te_parser::state *s)
                 else if (tok == ')') { s->m_type = te_parser::state::token_type::TOK_CLOSE; }
                 else if (tok == get_list_separator()) { s->m_type = te_parser::state::token_type::TOK_SEP; }
                     // logical operators
-                else if (tok == '=') { s->m_type = te_parser::state::token_type::TOK_INFIX; s->m_value = static_cast<te_fun2>(_equal); }
+                else if (tok == '=') { s->m_type = te_parser::state::token_type::TOK_INFIX; s->m_value = static_cast<te_fun2>(equal); }
                 else if (tok == '<' && s->m_next[0] == '>') { s->m_type = te_parser::state::token_type::TOK_INFIX; s->m_value = static_cast<te_fun2>(_not_equal); ++s->m_next; }
                 else if (tok == '<' && s->m_next[0] == '=') { s->m_type = te_parser::state::token_type::TOK_INFIX; s->m_value = static_cast<te_fun2>(_less_than_equal_to); ++s->m_next; }
                 else if (tok == '<') { s->m_type = te_parser::state::token_type::TOK_INFIX; s->m_value = static_cast<te_fun2>(_less_than); }
@@ -564,7 +564,7 @@ te_expr* te_parser::power(te_parser::state *s) {
            is_function2(s->m_value) &&
            (get_function2(s->m_value) == add || get_function2(s->m_value) == sub ||
             get_function2(s->m_value) == _and || get_function2(s->m_value) == _or ||
-            get_function2(s->m_value) == _equal ||
+            get_function2(s->m_value) == equal ||
             get_function2(s->m_value) == _not_equal ||
             get_function2(s->m_value) == _less_than ||
             get_function2(s->m_value) == _less_than_equal_to ||
@@ -672,7 +672,7 @@ te_expr* te_parser::expr(te_parser::state *s) {
            (get_function2(s->m_value) == add ||
             get_function2(s->m_value) == _and ||
             get_function2(s->m_value) == _or ||
-            get_function2(s->m_value) == _equal ||
+            get_function2(s->m_value) == equal ||
             get_function2(s->m_value) == _not_equal ||
             get_function2(s->m_value) == _less_than ||
             get_function2(s->m_value) == _less_than_equal_to ||

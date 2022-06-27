@@ -17,6 +17,9 @@ Parser::Parser(bool _isDebug)
     strFunc["PORTION"] = &Portion;
     strFunc["RELEASE"] = &Release;
     strFunc["APPEND"] = &Append;
+    strFunc["FREE"] = &Free;
+    strFunc["FREE_ARR"] = &FreeArr;
+    strFunc["FREE_PORTION"] = &FreePort;
 
     Funcs.emplace_back("PRINT");
     Funcs.emplace_back("LET");
@@ -28,6 +31,9 @@ Parser::Parser(bool _isDebug)
     Funcs.emplace_back("PORTION");
     Funcs.emplace_back("RELEASE");
     Funcs.emplace_back("APPEND");
+    Funcs.emplace_back("FREE");
+    Funcs.emplace_back("FREE_ARR");
+    Funcs.emplace_back("FREE_PORTION");
 }
 
 std::vector<Tok>::iterator setToken;
@@ -350,9 +356,9 @@ std::string Let()
                 {
                     if (curToken.text == "TE_MATH")
                     {
-                        std::string toks {tokensOnLine[4].text};
-                        toks = GetVarsInStr(toks);
-                        long double val {Math(toks.c_str())};
+                        std::string _tokens {tokensOnLine[4].text};
+                        _tokens = GetVarsInStr(_tokens);
+                        long double val {Math(_tokens.c_str())};
 
                         if (IsWhole(val))
                         {
@@ -1175,9 +1181,9 @@ std::string Append()
                 {
                     if (token.text == "TE_MATH")
                     {
-                        std::string toks {token.text};
-                        toks = GetVarsInStr(toks);
-                        long double val {Math(toks.c_str())};
+                        std::string _tokens {token.text};
+                        _tokens = GetVarsInStr(_tokens);
+                        long double val {Math(_tokens.c_str())};
 
                         if (IsWhole(val) && arrays[arrName].dataType == INT)
                         {
@@ -1259,6 +1265,117 @@ std::string Append()
                 );
         }
     }
+
+    return {};
+}
+
+std::string Free()
+{
+    if (tokensOnLine.size() != 2)
+    {
+        throw std::runtime_error
+        (
+            std::string("Incorrect argument count: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(tokensOnLine[0].lineNumber)
+            + std::string(", ")
+            + std::to_string(tokensOnLine[0].charIndex)
+            + std::string(").")
+        );
+    }
+
+    const Tok &varName {tokensOnLine[1]};
+
+    if (!IsVar(varName.text))
+    {
+        throw std::runtime_error
+        (
+            std::string("Could not find variable: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(varName.lineNumber)
+            + std::string(", ")
+            + std::to_string(varName.charIndex)
+            + std::string(").")
+        );
+    }
+
+    variables.erase(varName.text);
+
+    return {};
+}
+
+std::string FreeArr()
+{
+    if (tokensOnLine.size() != 2)
+    {
+        throw std::runtime_error
+        (
+            std::string("Incorrect argument count: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(tokensOnLine[0].lineNumber)
+            + std::string(", ")
+            + std::to_string(tokensOnLine[0].charIndex)
+            + std::string(").")
+        );
+    }
+
+    const Tok &arrName {tokensOnLine[1]};
+
+    if (!IsArr(arrName.text))
+    {
+        throw std::runtime_error
+        (
+            std::string("Could not find array: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(arrName.lineNumber)
+            + std::string(", ")
+            + std::to_string(arrName.charIndex)
+            + std::string(").")
+        );
+    }
+
+    arrays.erase(arrName.text);
+
+    return {};
+}
+
+std::string FreePort()
+{
+    if (tokensOnLine.size() != 2)
+    {
+        throw std::runtime_error
+        (
+            std::string("Incorrect argument count: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(tokensOnLine[0].lineNumber)
+            + std::string(", ")
+            + std::to_string(tokensOnLine[0].charIndex)
+            + std::string(").")
+        );
+    }
+
+    const Tok &portName {tokensOnLine[1]};
+
+    if (!IsPort(portName.text))
+    {
+        throw std::runtime_error
+        (
+            std::string("Could not find portion: ")
+            + std::to_string(tokensOnLine.size())
+            + std::string(". (")
+            + std::to_string(portName.lineNumber)
+            + std::string(", ")
+            + std::to_string(portName.charIndex)
+            + std::string(").")
+        );
+    }
+
+    portions.erase(portName.text);
 
     return {};
 }
@@ -1431,9 +1548,9 @@ void ReAssignVar()
                 {
                     if (curToken.text == "TE_MATH")
                     {
-                        std::string toks {tokensOnLine[i + 1].text};
-                        toks = GetVarsInStr(toks);
-                        long double val {Math(toks.c_str())};
+                        std::string _tokens {tokensOnLine[i + 1].text};
+                        _tokens = GetVarsInStr(_tokens);
+                        long double val {Math(_tokens.c_str())};
 
                         if (IsWhole(val))
                         {
@@ -1571,9 +1688,9 @@ void ReAssignArr()
                 {
                     if (token.text == "TE_MATH")
                     {
-                        std::string toks {tokensOnLine[i + 1].text};
-                        toks = GetVarsInStr(toks);
-                        long double val {Math(toks.c_str())};
+                        std::string _tokens {tokensOnLine[i + 1].text};
+                        _tokens = GetVarsInStr(_tokens);
+                        long double val {Math(_tokens.c_str())};
 
                         if (IsWhole(val))
                         {
