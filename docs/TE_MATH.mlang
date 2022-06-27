@@ -1,0 +1,25 @@
+// The TE_MATH keyword is used when doing mathematical expressions.
+// They are structured as follows:
+// TE_MATH " [Mathematical-expression-in-string] "
+
+PRINT TE_MATH "1 + 2 * 3"
+
+// (This will print: '7')
+
+// to access variables in TE_MATH put them in a pair of curly braces:
+
+LET i: 5
+
+PRINT i " - " TE_MATH "{i} * 2"
+
+// (This will print: "5 - 10")
+
+// to access array elements, you structure it as follows:
+//           / - (Actual brackets)
+// TE_MATH " [ (Array-name) ; (Array-index) ]
+
+ARR a: 10 20 30 40 50
+
+PRINT a 4 " - " TE_MATH "[a;4] * 2"
+
+// (This will print: "50 - 100")

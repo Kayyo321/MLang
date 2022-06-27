@@ -3,4 +3,4 @@ project(Basic)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Basic Main.cpp Lexer.cpp Lexer.h Token.h Parser.cpp Parser.h)
+add_executable(Basic Main.cpp Lexer.cpp Lexer.h Token.h Parser.cpp Parser.h TinyExpr/TinyExpr.cpp TinyExpr/TinyExpr.h)

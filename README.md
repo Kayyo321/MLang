@@ -21,6 +21,11 @@ Why not?
 
 Go to the [Docs](docs) directory to see how to use MyLang
 
+## Credit
+
+Credit to [Tiny-Expression](https://github.com/Blake-Madden/tinyexpr-plusplus), by [Blake Madden](https://github.com/Blake-Madden)
+for the TE_MATH keyword; doing mathematical expressions.
+
 ## Before && After
 
 #### **(Test.mlang)**
@@ -57,7 +62,7 @@ LET i: 0
 
 IF i < 11 340
     PRINT "i: " i "\n"
-    i + 1
+    i: TE_MATH "{i} + 1"
     GOTO 300
 ENDIF
 
@@ -69,7 +74,7 @@ LET o: 0
 
 IF o < 5 460
     PRINT a o " - a [" o "]\n"
-    o + 1
+    o: TE_MATH "{o} + 1"
     GOTO 420
 ENDIF
 
@@ -81,7 +86,7 @@ o: 0
 
 IF o < 5 580
     PRINT a o " - a [" o "]\n"
-    o + 1
+    o: TE_MATH "{o} + 1"
     GOTO 540
 ENDIF
 

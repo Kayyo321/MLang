@@ -4,6 +4,6 @@ PRINT "Morning\n"
 
 GOTO 30
 
-// ^ Prints "Morning" and a new line,
+// Prints "Morning" and a new line,
 // then goes back to that line, and repeats.
 // (Infinite loop)

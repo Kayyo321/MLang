@@ -12,7 +12,7 @@ IF b < 5 360
     // [Array-name] [Array-index]
 
     PRINT a b " - a [" b "]\n"
-    b + 1
+    b: TE_MATH "{b} + 1"
     GOTO 320
 ENDIF
 

@@ -29,7 +29,7 @@ LET i: 0
 
 IF i < 11 340
     PRINT "i: " i "\n"
-    i + 1
+    i: TE_MATH "{i} + 1"
     GOTO 300
 ENDIF
 
@@ -41,7 +41,7 @@ LET o: 0
 
 IF o < 5 460
     PRINT a o " - a [" o "]\n"
-    o + 1
+    o: TE_MATH "{o} + 1"
     GOTO 420
 ENDIF
 
@@ -53,7 +53,7 @@ o: 0
 
 IF o < 5 580
     PRINT a o " - a [" o "]\n"
-    o + 1
+    o: TE_MATH "{o} + 1"
     GOTO 540
 ENDIF
 
@@ -64,3 +64,5 @@ PORTION TEST > "../PortionedCode.mlang"
 RELEASE TEST
 
 PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
+
+END 0

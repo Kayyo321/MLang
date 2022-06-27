@@ -140,8 +140,23 @@ void Parser::ParseID()
                 else if (tokensOnLine[i + 1].type == OPERATOR
                          && tokensOnLine[i + 1].text != ":")
                 {
+                    if (tokensOnLine[i + 2].type != STRING)
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Unexpected data-type: ")
+                            + tokensOnLine[i].text
+                            + std::string(". TE_MATH needs a string (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+
+                    const char *expr {tokensOnLine[i + 2].text.c_str()};
                     const std::string &varName {tokensOnLine[0].text};
-                    signed long int newVal {Math()};
+                    long double newVal {Math(expr)};
 
                     variables[varName].text = std::to_string(newVal);
                 }
@@ -254,13 +269,27 @@ std::string Let()
             case 1:
                 if (tokensOnLine[1].type == IDENTIFIER)
                 {
+                    if (IsVar(tokensOnLine[1].text))
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Variable name already exists: ")
+                            + tokensOnLine[1].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[1].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[1].charIndex)
+                            + std::string(").")
+                        );
+                    }
+
                     x.name = tokensOnLine[1].text;
                 }
                 else
                 {
                     throw std::runtime_error
                     (
-                        std::string("Unknown variable name: ")
+                        std::string("Unexpected variable name: ")
                         + tokensOnLine[1].text
                         + std::string(". (")
                         + std::to_string(tokensOnLine[1].lineNumber)
@@ -292,8 +321,55 @@ std::string Let()
                 }
 
             case 3:
-                x.dataType = tokensOnLine[3].type;
-                x.text = tokensOnLine[3].text;
+            {
+                const Tok &token {tokensOnLine[3]};
+
+                if (token.type == IDENTIFIER)
+                {
+                    if (token.text == "TE_MATH")
+                    {
+                        std::string toks {tokensOnLine[4].text};
+                        toks = GetVarsInStr(toks.c_str());
+                        long double val {Math(toks.c_str())};
+
+                        if (IsWhole(val))
+                        {
+                            x.dataType = INT;
+                            x.text = std::to_string((int)val);
+                        }
+                        else
+                        {
+                            x.dataType = DOUBLE;
+                            x.text = std::to_string((double)val);
+                        }
+
+                        ++i;
+                    }
+                    else if (IsVar(token.text))
+                    {
+                        x.dataType = variables[token.text].dataType;
+                        x.text = variables[token.text].text;
+                    }
+                    else
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Unexpected identifier: ")
+                            + tokensOnLine[i].text
+                            + std::string(". (")
+                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::string(", ")
+                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::string(").")
+                        );
+                    }
+                }
+                else
+                {
+                    x.dataType = token.type;
+                    x.text = token.text;
+                }
+            }
                 break;
 
             default:
@@ -334,7 +410,22 @@ std::string Arr()
         {
             if (tokensOnLine[1].type == IDENTIFIER)
             {
+                if (IsArr(token.text))
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Array name already exists: ")
+                        + tokensOnLine[i].text
+                        + std::string(". (")
+                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::string(", ")
+                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::string(").")
+                    );
+                }
+
                 x.name = token.text;
+
                 continue;
             }
             else
@@ -1093,6 +1184,16 @@ bool IsPort(const std::string &value)
     return false;
 }
 
+bool IsWhole(long double d)
+{
+    if ((d - floor(d) < 0.000000001) || (d - floor(d) > 0.9999999999))
+    {
+        return true;
+    }
+
+    return false;
+}
+
 void ReAssignVar()
 {
     std::string var;
@@ -1138,6 +1239,30 @@ void ReAssignVar()
                     variables[var].text = token;
 
                     continue;
+                }
+                if (tokensOnLine[2].type == IDENTIFIER)
+                {
+                    if (tokensOnLine[2].text == "TE_MATH")
+                    {
+                        std::string toks {tokensOnLine[3].text};
+                        toks = GetVarsInStr(toks.c_str());
+                        long double val {Math(toks.c_str())};
+
+                        if (IsWhole(val))
+                        {
+                            variables[var].dataType = INT;
+                            variables[var].text = std::to_string((int)val);
+                        }
+                        else
+                        {
+                            variables[var].dataType = DOUBLE;
+                            variables[var].text = std::to_string((double)val);
+                        }
+
+                        ++i;
+
+                        continue;
+                    }
                 }
 
                 throw std::runtime_error
@@ -1257,6 +1382,28 @@ void ReAssignArr()
             case 3:
                 if (token.type == IDENTIFIER)
                 {
+                    if (token.text == "TE_MATH")
+                    {
+                        std::string toks {tokensOnLine[4].text};
+                        toks = GetVarsInStr(toks.c_str());
+                        long double val {Math(toks.c_str())};
+
+                        if (IsWhole(val))
+                        {
+                            arrays[arr].dataType = INT;
+                            arrays[arr].children[index].text = std::to_string((int)val);
+                        }
+                        else
+                        {
+                            arrays[arr].dataType = DOUBLE;
+                            arrays[arr].children[index].text = std::to_string((double)val);
+                        }
+
+                        ++i;
+
+                        continue;
+                    }
+
                     if (IsVar(token.text))
                     {
                         if (arrType == variables[token.text].dataType)
@@ -1315,174 +1462,133 @@ void ReAssignArr()
     }
 }
 
-void ParseMath(const std::string &lhs, Operator op, const std::string &rhs, signed long int &ref)
+long double Math(const char *expr)
 {
-    int x {stoi(lhs)}, y {stoi(rhs)};
+    te_parser tep;
 
-    switch (op)
+    const long double ret {tep.evaluate(expr)};
+
+    if (tep.success())
     {
-        case ADD:
-            ref = x + y;
-            break;
-
-        case SUB:
-            ref = x - y;
-            break;
-
-        case MUL:
-            ref = x * y;
-            break;
-
-        case DIV:
-            ref = x / y;
-            break;
-
-        case MOD:
-            ref = x % y;
-            break;
+        return ret;
     }
+
+    throw std::runtime_error
+    (
+        std::string
+        (
+            "TE_MATH failed in function, cannot reach token values..."
+        )
+    );
 }
 
-signed long int Math()
+std::string GetVarsInStr(std::string str)
 {
-    signed long int ret {};
+    std::string ret {}, delim {};
 
-    std::string lhs, rhs;
-    Operator op;
+    int stage {0};
 
-    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    size_t startIndex {}, len {str.length()};
+
+    for (size_t i {0}; i < len; ++i)
     {
-        const Tok &curToken {tokensOnLine[i]};
+        const char c {str[i]};
 
-        switch (i)
+        switch (c)
         {
-            case 0:
-                if (curToken.type == IDENTIFIER)
-                {
-                    if (InArray(curToken.text, Funcs))
-                    {
-                        /* Function call */
-
-                        lhs = (strFunc[curToken.text]());
-
-                        break;
-                    }
-
-                    if (IsVar(curToken.text))
-                    {
-                        lhs = (variables[curToken.text].text);
-
-                        break;
-                    }
-
-                    throw std::runtime_error
-                            (
-                                    std::string("Unexpected Identifier: ")
-                                    + tokensOnLine[i].text
-                                    + std::string(". (")
-                                    + std::to_string(tokensOnLine[i].lineNumber)
-                                    + std::string(", ")
-                                    + std::to_string(tokensOnLine[i].charIndex)
-                                    + std::string(").")
-                            );
-                }
-                else
-                {
-                    lhs = curToken.text;
-                }
+            case '[':
+            case '{':
+                stage = 1;
+                startIndex = i;
                 break;
 
-            case 1:
-                if (curToken.type != OPERATOR)
+            case '}':
+                stage = 0;
+
+                if (IsVar(delim))
                 {
-                    throw std::runtime_error
-                            (
-                                    std::string("Unexpected token: ")
-                                    + tokensOnLine[i].text
-                                    + std::string(". (")
-                                    + std::to_string(tokensOnLine[i].lineNumber)
-                                    + std::string(", ")
-                                    + std::to_string(tokensOnLine[i].charIndex)
-                                    + std::string(").")
-                            );
+                    ret.insert(startIndex, variables[delim].text);
                 }
 
-                if (curToken.text == "+")
-                    op = ADD;
-                else if (curToken.text == "-")
-                    op = SUB;
-                else if (curToken.text == "*")
-                    op = MUL;
-                else if (curToken.text == "/")
-                    op = DIV;
-                else if (curToken.text == "%")
-                    op = MOD;
+                delim.erase();
+                break;
+
+            case ']':
+            {
+                stage = 0;
+
+                if (delim.length() != 3)
+                {
+                    throw std::runtime_error
+                    (
+                        std::string
+                        (
+                        "Incorrect arguments for array reassigning."
+                        )
+                    );
+                }
+
+                if (delim[1] != ';')
+                {
+                    throw std::runtime_error
+                    (
+                        std::string
+                        (
+                        "Needs a ';' between array and index."
+                        )
+                    );
+                }
+
+                const std::string arrName {delim[0]};
+
+                if (IsArr(arrName))
+                {
+                    std::string varName {delim[2]};
+                    unsigned int index {};
+
+                    if (std::isdigit(delim[2]))
+                    {
+                        const std::string i {delim[2]};
+                        index = std::stoi(i);
+                    }
+                    else if (IsVar(varName)
+                             && variables[varName].dataType == INT)
+                    {
+                        index = std::stoi(variables[varName].text);
+                    }
+                    else
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string
+                            (
+                            "index needs to be an integer"
+                            )
+                        );
+                    }
+
+                    ret.insert(startIndex, arrays[arrName].children[index].text);
+                }
                 else
                 {
                     throw std::runtime_error
                     (
-                        std::string("Unexpected operator: ")
-                        + tokensOnLine[i].text
-                        + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
-                        + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
-                        + std::string(").")
+                        std::string("Cannot find array: \"")
+                        + arrName
+                        + std::string("\".")
                     );
                 }
-                break;
-
-            case 2:
-                if (curToken.type == IDENTIFIER)
-                {
-                    if (InArray(curToken.text, Funcs))
-                    {
-                        /* Function call */
-
-                        rhs = (strFunc[curToken.text]());
-
-                        break;
-                    }
-
-                    if (IsVar(curToken.text))
-                    {
-                        rhs = (variables[curToken.text].text);
-
-                        break;
-                    }
-
-                    throw std::runtime_error
-                    (
-                        std::string("Unexpected Identifier: ")
-                        + tokensOnLine[i].text
-                        + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
-                        + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
-                        + std::string(").")
-                    );
-                }
-                else
-                {
-                    rhs = curToken.text;
-                }
+            }
                 break;
 
             default:
-                throw std::runtime_error
-                (
-                    std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
-                    + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
-                    + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
-                    + std::string(").")
-                );
+                if (stage == 1)
+                    delim += c;
+                else
+                    ret += c;
+                break;
         }
     }
-
-    ParseMath(lhs, op, rhs, ret);
 
     return ret;
 }

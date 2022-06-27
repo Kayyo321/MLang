@@ -10,6 +10,7 @@
 
 #include "Token.h"
 #include "Lexer.h"
+#include "TinyExpr/TinyExpr.h"
 
 class Variable;
 class Array;
@@ -38,21 +39,12 @@ enum BoolOperator
     LESS
 };
 
-enum Operator
-{
-    ADD,
-    SUB,
-    DIV,
-    MUL,
-    MOD
-};
-
 class Parser
 {
 public:
     explicit Parser(bool);
 
-    void Parse(std::vector<Tok>&);
+    void Parse(std::vector<Tok> &);
 
 private:
     void ParseLine();
@@ -92,13 +84,16 @@ void Goto(size_t);
 void ReAssignVar();
 void ReAssignArr();
 
-signed long int Math();
-
-bool CheckIf(const std::string&,
+bool CheckIf(const std::string &,
              enum BoolOperator,
-             const std::string&);
+             const std::string &);
 
-bool InArray(const std::string &value, const std::vector<std::string> &array);
-bool IsVar(const std::string &value);
-bool IsArr(const std::string &value);
-bool IsPort(const std::string &value);
+bool InArray(const std::string &, const std::vector<std::string> &);
+bool IsVar(const std::string &);
+bool IsArr(const std::string &);
+bool IsPort(const std::string &);
+bool IsWhole(long double);
+
+long double Math(const char *);
+
+std::string GetVarsInStr(std::string);
