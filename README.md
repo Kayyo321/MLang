@@ -1,4 +1,4 @@
-# MyLang
+# MLang
 
 A BASIC styled language
 
@@ -19,7 +19,7 @@ Why not?
 
 ## Learning 
 
-Go to the [Docs](docs) directory to see how to use MyLang
+Go to the [Docs](docs) directory to see how to use MLang
 
 ## Credit
 
