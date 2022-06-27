@@ -44,7 +44,7 @@ class Parser
 public:
     explicit Parser(bool);
 
-    void Parse(std::vector<Tok> &);
+    void Parse(const std::vector<Tok> &);
 
 private:
     void ParseLine();

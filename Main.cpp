@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
     Lexer *lexer {new Lexer {}};
 
-    std::vector<Tok> lexedTokens {lexer->Parse(contents, debug)};
+    const std::vector<Tok> lexedTokens {lexer->Parse(contents, debug)};
 
     delete lexer;
 

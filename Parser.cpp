@@ -32,11 +32,12 @@ Parser::Parser(bool _isDebug)
 
 std::vector<Tok>::iterator setToken;
 
-void Parser::Parse(std::vector<Tok> &_tokens)
+void Parser::Parse(const std::vector<Tok> &_tokens)
 {
-    endToken = _tokens.end();
-    curToken = _tokens.begin();
     tokens = _tokens;
+
+    curToken = tokens.begin();
+    endToken = tokens.end();
 
     while (curToken != endToken)
     {
@@ -179,7 +180,7 @@ std::string Print()
     {
         if (i == 0) continue;
 
-        const Tok curToken {tokensOnLine[i]};
+        const Tok &curToken {tokensOnLine[i]};
 
         if (curToken.type == IDENTIFIER)
         {
@@ -227,9 +228,9 @@ std::string Print()
                         std::string("Index should be integer: ")
                         + tokensOnLine[i + 1].text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -240,11 +241,11 @@ std::string Print()
             throw std::runtime_error
             (
                 std::string("Unknown identifier: ")
-                + tokensOnLine[i].text
+                + curToken.text
                 + std::string(". (")
-                + std::to_string(tokensOnLine[i].lineNumber)
+                + std::to_string(curToken.lineNumber)
                 + std::string(", ")
-                + std::to_string(tokensOnLine[i].charIndex)
+                + std::to_string(curToken.charIndex)
                 + std::string(").")
             );
         }
@@ -263,48 +264,50 @@ std::string Let()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
+        const Tok &curToken {tokensOnLine[i]};
+
         switch (i)
         {
             case 0:
                 continue;
 
             case 1:
-                if (tokensOnLine[1].type == IDENTIFIER)
+                if (curToken.type == IDENTIFIER)
                 {
                     if (IsVar(tokensOnLine[1].text))
                     {
                         throw std::runtime_error
                         (
                             std::string("Variable name already exists: ")
-                            + tokensOnLine[1].text
+                            + curToken.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[1].lineNumber)
+                            + std::to_string(curToken.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[1].charIndex)
+                            + std::to_string(curToken.charIndex)
                             + std::string(").")
                         );
                     }
 
-                    x.name = tokensOnLine[1].text;
+                    x.name = curToken.text;
                 }
                 else
                 {
                     throw std::runtime_error
                     (
                         std::string("Unexpected variable name: ")
-                        + tokensOnLine[1].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[1].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[1].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
                 break;
 
             case 2:
-                if (tokensOnLine[2].type == OPERATOR
-                    && tokensOnLine[2].text == ":")
+                if (curToken.type == OPERATOR
+                    && curToken.text == ":")
                 {
                     continue;
                 }
@@ -313,22 +316,20 @@ std::string Let()
                     throw std::runtime_error
                     (
                         std::string("Unknown operator: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
 
             case 3:
             {
-                const Tok &token {tokensOnLine[3]};
-
-                if (token.type == IDENTIFIER)
+                if (curToken.type == IDENTIFIER)
                 {
-                    if (token.text == "TE_MATH")
+                    if (curToken.text == "TE_MATH")
                     {
                         std::string toks {tokensOnLine[4].text};
                         toks = GetVarsInStr(toks);
@@ -347,29 +348,29 @@ std::string Let()
 
                         ++i;
                     }
-                    else if (IsVar(token.text))
+                    else if (IsVar(curToken.text))
                     {
-                        x.dataType = variables[token.text].dataType;
-                        x.text = variables[token.text].text;
+                        x.dataType = variables[curToken.text].dataType;
+                        x.text = variables[curToken.text].text;
                     }
                     else
                     {
                         throw std::runtime_error
                         (
                             std::string("Unexpected identifier: ")
-                            + tokensOnLine[i].text
+                            + curToken.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::to_string(curToken.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::to_string(curToken.charIndex)
                             + std::string(").")
                         );
                     }
                 }
                 else
                 {
-                    x.dataType = token.type;
-                    x.text = token.text;
+                    x.dataType = curToken.type;
+                    x.text = curToken.text;
                 }
             }
                 break;
@@ -378,11 +379,11 @@ std::string Let()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
         }
@@ -417,11 +418,11 @@ std::string Arr()
                     throw std::runtime_error
                     (
                         std::string("Array name already exists: ")
-                        + tokensOnLine[i].text
+                        + token.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(token.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(token.charIndex)
                         + std::string(").")
                     );
                 }
@@ -435,11 +436,11 @@ std::string Arr()
                 throw std::runtime_error
                 (
                     std::string("Unknown variable name: ")
-                    + tokensOnLine[1].text
+                    + token.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[1].lineNumber)
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[1].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
             }
@@ -447,8 +448,8 @@ std::string Arr()
 
         if (i == 2)
         {
-            if (tokensOnLine[2].type == OPERATOR
-                && tokensOnLine[2].text == ":")
+            if (token.type == OPERATOR
+                && token.text == ":")
             {
                 continue;
             }
@@ -457,11 +458,11 @@ std::string Arr()
                 throw std::runtime_error
                 (
                     std::string("Unknown operator: ")
-                    + tokensOnLine[i].text
+                    + token.text
                     + std::string(". Expected ':' (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
             }
@@ -486,11 +487,11 @@ std::string Arr()
                         throw std::runtime_error
                         (
                             std::string("Unknown identifier: ")
-                            + tokensOnLine[i].text
+                            + token.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::to_string(token.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::to_string(token.charIndex)
                             + std::string(").")
                         );
                     }
@@ -511,11 +512,11 @@ std::string Arr()
                                 throw std::runtime_error
                                 (
                                     std::string("Unexpected data-type: ")
-                                    + tokensOnLine[i].text
+                                    + token.text
                                     + std::string(". (")
-                                    + std::to_string(tokensOnLine[i].lineNumber)
+                                    + std::to_string(token.lineNumber)
                                     + std::string(", ")
-                                    + std::to_string(tokensOnLine[i].charIndex)
+                                    + std::to_string(token.charIndex)
                                     + std::string(").")
                                 );
                             }
@@ -528,11 +529,11 @@ std::string Arr()
                         throw std::runtime_error
                         (
                             std::string("Unknown identifier: ")
-                            + tokensOnLine[i].text
+                            + token.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::to_string(token.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::to_string(token.charIndex)
                             + std::string(").")
                         );
                     }
@@ -543,15 +544,15 @@ std::string Arr()
                             throw std::runtime_error
                             (
                                 std::string("Unexpected data-type: (")
-                                + tokensOnLine[i].text
+                                + token.text
                                 + std::string(", ")
-                                + TokenTypeStrings[tokensOnLine[i].type]
+                                + TokenTypeStrings[token.type]
                                 + std::string(") against: (")
                                 + TokenTypeStrings[x.dataType]
                                 + std::string("). (")
-                                + std::to_string(tokensOnLine[i].lineNumber)
+                                + std::to_string(token.lineNumber)
                                 + std::string(", ")
-                                + std::to_string(tokensOnLine[i].charIndex)
+                                + std::to_string(token.charIndex)
                                 + std::string(").")
                             );
                         }
@@ -610,11 +611,11 @@ std::string If()
                     throw std::runtime_error
                     (
                         std::string("Unexpected Identifier: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -630,11 +631,11 @@ std::string If()
                     throw std::runtime_error
                     (
                         std::string("Unexpected token: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -652,11 +653,11 @@ std::string If()
                     throw std::runtime_error
                     (
                         std::string("Unexpected operator: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -684,11 +685,11 @@ std::string If()
                     throw std::runtime_error
                     (
                         std::string("Unexpected Identifier: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -708,11 +709,11 @@ std::string If()
                     throw std::runtime_error
                     (
                         std::string("ENDIF needs an integer: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -722,11 +723,11 @@ std::string If()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
         }
@@ -829,26 +830,28 @@ std::string Goto()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
+        const Tok &curToken {tokensOnLine[i]};
+
         switch (i)
         {
             case 0:
                 continue;
 
             case 1:
-                if (tokensOnLine[1].type == INT)
+                if (curToken.type == INT)
                 {
-                    line = stoi(tokensOnLine[1].text);
+                    line = stoi(curToken.text);
                 }
                 else
                 {
                     throw std::runtime_error
                     (
                         std::string("GOTO needs an integer: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
@@ -858,11 +861,11 @@ std::string Goto()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
         }
@@ -922,29 +925,31 @@ std::string End()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
+        const Tok &curToken {tokensOnLine[i]};
+
         switch (i)
         {
             case 0:
                 continue;
 
             case 1:
-                if (tokensOnLine[1].type == INT
-                    || tokensOnLine[1].type == DOUBLE)
+                if (curToken.type == INT
+                    || curToken.type == DOUBLE)
                 {
-                    exitCode = stoi(tokensOnLine[1].text);
+                    exitCode = stoi(curToken.text);
                 }
                 else
                 {
                     throw std::runtime_error
-                            (
-                                    std::string("GOTO needs an integer: ")
-                                    + tokensOnLine[i].text
-                                    + std::string(". (")
-                                    + std::to_string(tokensOnLine[i].lineNumber)
-                                    + std::string(", ")
-                                    + std::to_string(tokensOnLine[i].charIndex)
-                                    + std::string(").")
-                            );
+                    (
+                        std::string("GOTO needs an integer: ")
+                        + curToken.text
+                        + std::string(". (")
+                        + std::to_string(curToken.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(curToken.charIndex)
+                        + std::string(").")
+                    );
                 }
                 break;
 
@@ -952,11 +957,11 @@ std::string End()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
         }
@@ -989,11 +994,11 @@ std::string Portion()
                 throw std::runtime_error
                 (
                     std::string("Unexpected token: ")
-                    + tokensOnLine[i].text
+                    + token.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
 
@@ -1007,11 +1012,11 @@ std::string Portion()
                 throw std::runtime_error
                 (
                     std::string("Unexpected token: ")
-                    + tokensOnLine[i].text
-                    + std::string(". Expected an operator: '>' (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
 
@@ -1026,11 +1031,11 @@ std::string Portion()
                 throw std::runtime_error
                 (
                     std::string("Unexpected token: ")
-                    + tokensOnLine[i].text
-                    + std::string(". Expected a string (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + token.text
+                    + std::string(". (")
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
 
@@ -1038,11 +1043,11 @@ std::string Portion()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + token.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(token.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(token.charIndex)
                     + std::string(").")
                 );
         }
@@ -1187,11 +1192,11 @@ std::string Append()
                         throw std::runtime_error
                         (
                             std::string("Unexpected identifier: ")
-                            + tokensOnLine[i].text
+                            + token.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::to_string(token.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::to_string(token.charIndex)
                             + std::string(").")
                         );
                     }
@@ -1210,11 +1215,11 @@ std::string Append()
                         throw std::runtime_error
                         (
                             std::string("Array type miss-match: ")
-                            + tokensOnLine[i].text
+                            + token.text
                             + std::string(". (")
-                            + std::to_string(tokensOnLine[i].lineNumber)
+                            + std::to_string(token.lineNumber)
                             + std::string(", ")
-                            + std::to_string(tokensOnLine[i].charIndex)
+                            + std::to_string(token.charIndex)
                             + std::string(").")
                         );
                     }
@@ -1332,51 +1337,52 @@ void ReAssignVar()
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
+        const Tok &curToken {tokensOnLine[i]};
+
         switch (i)
         {
             case 0:
-                var = tokensOnLine[0].text;
+                var = curToken.text;
                 break;
 
             case 1:
-                if (tokensOnLine[1].type != OPERATOR
-                    || tokensOnLine[1].text != ":")
+                if (curToken.type != OPERATOR
+                    || curToken.text != ":")
                 {
                     throw std::runtime_error
                     (
                         std::string("Unexpected token: ")
-                        + tokensOnLine[i].text
+                        + curToken.text
                         + std::string(". (")
-                        + std::to_string(tokensOnLine[i].lineNumber)
+                        + std::to_string(curToken.lineNumber)
                         + std::string(", ")
-                        + std::to_string(tokensOnLine[i].charIndex)
+                        + std::to_string(curToken.charIndex)
                         + std::string(").")
                     );
                 }
                 break;
 
             case 2:
-                if (tokensOnLine[2].type == OPERATOR
-                    && tokensOnLine[2].text == "*")
+                if (curToken.type == OPERATOR
+                    && curToken.text == "*")
                 {
                     /* Changing data-type */
-                    variables[var].dataType = tokensOnLine[3].type;
-                    variables[var].text = tokensOnLine[3].text;
+                    variables[var].dataType = tokensOnLine[i + 1].type;
+                    variables[var].text = tokensOnLine[i + 1].text;
 
                     continue;
                 }
-                else if (tokensOnLine[2].type == variables[var].dataType)
+                else if (curToken.type == variables[var].dataType)
                 {
-                    const std::string &token {tokensOnLine[2].text};
-                    variables[var].text = token;
+                    variables[var].text = curToken.text;
 
                     continue;
                 }
-                if (tokensOnLine[2].type == IDENTIFIER)
+                if (curToken.type == IDENTIFIER)
                 {
-                    if (tokensOnLine[2].text == "TE_MATH")
+                    if (curToken.text == "TE_MATH")
                     {
-                        std::string toks {tokensOnLine[3].text};
+                        std::string toks {tokensOnLine[i + 1].text};
                         toks = GetVarsInStr(toks);
                         long double val {Math(toks.c_str())};
 
@@ -1420,11 +1426,11 @@ void ReAssignVar()
                 throw std::runtime_error
                 (
                     std::string("Too many arguments: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
         }
@@ -1505,7 +1511,7 @@ void ReAssignArr()
                         + std::string(". (")
                         + std::to_string(token.lineNumber)
                         + std::string(", ")
-                        + std::to_string(token .charIndex)
+                        + std::to_string(token.charIndex)
                         + std::string(").")
                     );
                 }
@@ -1516,7 +1522,7 @@ void ReAssignArr()
                 {
                     if (token.text == "TE_MATH")
                     {
-                        std::string toks {tokensOnLine[4].text};
+                        std::string toks {tokensOnLine[i + 1].text};
                         toks = GetVarsInStr(toks);
                         long double val {Math(toks.c_str())};
 
