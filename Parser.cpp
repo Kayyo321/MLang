@@ -139,6 +139,8 @@ void Parser::ParseID()
                     && tokensOnLine[i + 1].text == ":")
                 {
                     ReAssignVar();
+
+                    break;
                 }
                 else if (tokensOnLine[i + 1].type == OPERATOR
                          && tokensOnLine[i + 1].text != ":")
@@ -169,6 +171,8 @@ void Parser::ParseID()
             if (IsArr(tok.text))
             {
                 ReAssignArr();
+
+                break;
             }
         }
     }
@@ -288,7 +292,22 @@ std::string Let()
                         );
                     }
 
-                    x.name = curToken.text;
+                    std::string _name {curToken.text};
+
+                    if (curToken.text[0] == '$')
+                    {
+                        x.isConst = true;
+
+                        _name.erase();
+
+                        for (size_t o {0}; o < curToken.text.size(); ++o)
+                        {
+                            if (o != 0)
+                                _name += curToken.text[o];
+                        }
+                    }
+
+                    x.name = _name;
                 }
                 else
                 {
@@ -411,7 +430,7 @@ std::string Arr()
 
         if (i == 1)
         {
-            if (tokensOnLine[1].type == IDENTIFIER)
+            if (token.type == IDENTIFIER)
             {
                 if (IsArr(token.text))
                 {
@@ -1342,7 +1361,37 @@ void ReAssignVar()
         switch (i)
         {
             case 0:
-                var = curToken.text;
+                if (IsVar(curToken.text))
+                {
+                    var = curToken.text;
+
+                    if (variables[var].isConst)
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string("Cannot re-assign const variable: ")
+                            + curToken.text
+                            + std::string(". (")
+                            + std::to_string(curToken.lineNumber)
+                            + std::string(", ")
+                            + std::to_string(curToken.charIndex)
+                            + std::string(").")
+                        );
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Couldn't find variable: ")
+                        + curToken.text
+                        + std::string(". (")
+                        + std::to_string(curToken.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(curToken.charIndex)
+                        + std::string(").")
+                    );
+                }
                 break;
 
             case 1:
@@ -1406,16 +1455,16 @@ void ReAssignVar()
                 throw std::runtime_error
                 (
                     std::string("Type miss-match: ")
-                    + tokensOnLine[i].text
+                    + curToken.text
                     + std::string(". (")
-                    + std::to_string(tokensOnLine[i].lineNumber)
+                    + std::to_string(curToken.lineNumber)
                     + std::string(", ")
-                    + std::to_string(tokensOnLine[i].charIndex)
+                    + std::to_string(curToken.charIndex)
                     + std::string(").")
                 );
 
             case 3:
-                if (tokensOnLine[3].type == variables[var].dataType)
+                if (curToken.type == variables[var].dataType)
                 {
                     const std::string &token {tokensOnLine[3].text};
                     variables[var].text = token;
@@ -1655,44 +1704,33 @@ std::string GetVarsInStr(std::string str)
             {
                 stage = 0;
 
-                if (delim.length() != 3)
+                std::string indexArr {}, indexStr {};
+
+                for (const char ch: delim)
                 {
-                    throw std::runtime_error
-                    (
-                        std::string
-                        (
-                        "Incorrect arguments for array reassigning."
-                        )
-                    );
+                    if (ch == ';')
+                    {
+                        stage = 1;
+
+                        continue;
+                    }
+
+                    if (stage == 1)
+                        indexStr += ch;
+                    else
+                        indexArr += ch;
                 }
 
-                if (delim[1] != ';')
+                if (IsArr(indexArr))
                 {
-                    throw std::runtime_error
-                    (
-                        std::string
-                        (
-                        "Needs a ';' between array and index."
-                        )
-                    );
-                }
-
-                const std::string arrName {delim[0]};
-
-                if (IsArr(arrName))
-                {
-                    std::string varName {delim[2]};
                     unsigned int index {};
 
-                    if (std::isdigit(delim[2]))
+                    std::stringstream ss {indexStr};
+                    if (ss >> index) {}
+                    else if (IsVar(indexStr)
+                             && variables[indexStr].dataType == INT)
                     {
-                        const std::string in {delim[2]};
-                        index = std::stoi(in);
-                    }
-                    else if (IsVar(varName)
-                             && variables[varName].dataType == INT)
-                    {
-                        index = std::stoi(variables[varName].text);
+                        index = std::stoi(variables[indexStr].text);
                     }
                     else
                     {
@@ -1705,18 +1743,21 @@ std::string GetVarsInStr(std::string str)
                         );
                     }
 
-                    ret.insert(startIndex, arrays[arrName].children[index].text);
+                    ret.insert(startIndex, arrays[indexArr].children[index].text);
                 }
                 else
                 {
                     throw std::runtime_error
                     (
                         std::string("Cannot find array: \"")
-                        + arrName
+                        + indexArr
                         + std::string("\".")
                     );
                 }
             }
+
+                stage = 0;
+
                 break;
 
             default:

@@ -40,10 +40,16 @@ std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
                     break;
 
                 default:
-                    std::cerr << "Lexer error:\n\tUnknown escape sequence '\\" << c << "', ("
-                        << curToken.lineNumber << ", " << curToken.charIndex << ").\n";
-
-                    exit(1);
+                    throw std::runtime_error
+                    (
+                          std::string ("Unknown escape sequence: '\\")
+                          + c
+                          + std::string ("', (")
+                          + std::to_string(curToken.lineNumber)
+                          + std::string (", ")
+                          + std::to_string(curToken.charIndex)
+                          + std::string (").\n")
+                    );
             }
 
             curToken.type = STRING;
@@ -165,6 +171,32 @@ std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
 
                     curToken.lineNumber += 10;
                     curToken.charIndex = 1;
+                }
+                break;
+
+            case '\'':
+                if (curToken.type == CHAR)
+                {
+                    if (curToken.text.length() > 1)
+                    {
+                        throw std::runtime_error
+                        (
+                            std::string ("Character can only hold one ASCII value: '")
+                            + curToken.text
+                            + std::string ("', (")
+                            + std::to_string(curToken.lineNumber)
+                            + std::string (", ")
+                            + std::to_string(curToken.charIndex)
+                            + std::string (").\n")
+                        );
+                    }
+
+                    NewToken();
+                }
+                else
+                {
+                    NewToken();
+                    curToken.type = CHAR;
                 }
                 break;
 

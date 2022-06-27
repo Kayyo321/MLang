@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 
 #include "Token.h"
 #include "Lexer.h"
@@ -59,6 +60,7 @@ class Variable
 public:
     enum TokenType dataType;
     std::string name, text;
+    bool isConst {false};
 };
 
 class Array

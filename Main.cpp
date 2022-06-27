@@ -45,7 +45,17 @@ int main(int argc, char **argv)
 
     Lexer *lexer {new Lexer {}};
 
-    const std::vector<Tok> lexedTokens {lexer->Parse(contents, debug)};
+    const std::vector<Tok> lexedTokens {};
+
+    try
+    {
+        std::vector<Tok> *wp {const_cast <std::vector<Tok> *> (&lexedTokens)};
+        *wp = lexer->Parse(contents, debug);
+    }
+    catch (const std::runtime_error &e)
+    {
+        std::cerr << "Lexer error occurred:\n\t" << e.what() << "\n";
+    }
 
     delete lexer;
 
