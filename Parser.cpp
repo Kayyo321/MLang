@@ -1188,17 +1188,26 @@ std::string Append()
                         if (IsWhole(val) && arrays[arrName].dataType == INT)
                         {
                             tok.text = std::to_string((int)val);
-                            tok.type = INT;
-
-                            arrays[arrName].children.push_back(tok);
+                        }
+                        else if (!IsWhole(val) && arrays[arrName].dataType == DOUBLE)
+                        {
+                            tok.text = std::to_string((double)val);
                         }
                         else
                         {
-                            tok.text = std::to_string((double)val);
-                            tok.type = DOUBLE;
-
-                            arrays[arrName].children.emplace_back(tok);
+                            throw std::runtime_error
+                            (
+                                std::string("Array specifications didn't match: ")
+                                + token.text
+                                + std::string(". (")
+                                + std::to_string(token.lineNumber)
+                                + std::string(", ")
+                                + std::to_string(token.charIndex)
+                                + std::string(").")
+                            );
                         }
+
+                        arrays[arrName].children.emplace_back(tok);
 
                         ++i;
                     }
@@ -1552,15 +1561,26 @@ void ReAssignVar()
                         _tokens = GetVarsInStr(_tokens);
                         long double val {Math(_tokens.c_str())};
 
-                        if (IsWhole(val))
+                        if (IsWhole(val) && variables[var].dataType == INT)
                         {
-                            variables[var].dataType = INT;
                             variables[var].text = std::to_string((int)val);
+                        }
+                        else if (!IsWhole(val) && variables[var].dataType == DOUBLE)
+                        {
+                            variables[var].text = std::to_string((double)val);
                         }
                         else
                         {
-                            variables[var].dataType = DOUBLE;
-                            variables[var].text = std::to_string((double)val);
+                            throw std::runtime_error
+                            (
+                                std::string("Variable specifications didn't match: ")
+                                + curToken.text
+                                + std::string(". (")
+                                + std::to_string(curToken.lineNumber)
+                                + std::string(", ")
+                                + std::to_string(curToken.charIndex)
+                                + std::string(").")
+                            );
                         }
 
                         ++i;
@@ -1692,15 +1712,26 @@ void ReAssignArr()
                         _tokens = GetVarsInStr(_tokens);
                         long double val {Math(_tokens.c_str())};
 
-                        if (IsWhole(val))
+                        if (IsWhole(val) && arrays[arr].dataType == INT)
                         {
-                            arrays[arr].dataType = INT;
                             arrays[arr].children[index].text = std::to_string((int)val);
+                        }
+                        else if (!IsWhole(val) && arrays[arr].dataType == DOUBLE)
+                        {
+                            arrays[arr].children[index].text = std::to_string((double)val);
                         }
                         else
                         {
-                            arrays[arr].dataType = DOUBLE;
-                            arrays[arr].children[index].text = std::to_string((double)val);
+                            throw std::runtime_error
+                            (
+                                std::string("Array specifications didn't match: ")
+                                + token.text
+                                + std::string(". (")
+                                + std::to_string(token.lineNumber)
+                                + std::string(", ")
+                                + std::to_string(token.charIndex)
+                                + std::string(").")
+                            );
                         }
 
                         ++i;
