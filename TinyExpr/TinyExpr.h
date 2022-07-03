@@ -64,6 +64,7 @@
 #include <cctype>
 #include <set>
 #include <iostream>
+#include <cstring>
 
 class te_expr;
 

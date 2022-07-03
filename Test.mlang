@@ -75,6 +75,6 @@ PORTION TEST > "../PortionedCode.mlang"
 
 RELEASE TEST
 
-PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
+PRINT "\n"
 
 END 0
