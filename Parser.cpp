@@ -1468,7 +1468,8 @@ bool IsPort(const std::string &value)
 
 bool IsWhole(long double d)
 {
-    if ((d - floor(d) < 0.000000001) || (d - floor(d) > 0.9999999999))
+    /*                 / - From 'long double' to 'double'  - \       */
+    if ((d - floor((double)d) < 0.000000001) || (d - floor((double)d) > 0.9999999999))
     {
         return true;
     }
