@@ -39,7 +39,7 @@ const static char *TokenTypeStrings[]
 class Tok
 {
 public:
-    enum TokenType type;
-    std::string text;
+    enum TokenType type {WHITESPACE};
+    std::string text {};
     size_t lineNumber {10}, charIndex {1};
 };

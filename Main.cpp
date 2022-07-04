@@ -31,10 +31,10 @@ int main(int argc, char **argv)
         }
     }
 
-    char *path {argv[1]};
+    const char *path {argv[1]};
 
     std::ifstream file {path};
-    std::string contents
+    const std::string contents
     {
             (std::istreambuf_iterator<char>(file)),
             std::istreambuf_iterator<char>()
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     try
     {
         std::vector<Tok> *wp {const_cast <std::vector<Tok> *> (&lexedTokens)};
-        *wp = lexer->Parse(contents, debug);
+        *wp = lexer->Parse(contents.c_str(), debug);
     }
     catch (const std::runtime_error &e)
     {
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
         std::cout << "\n}\n";
     }
 
-    Parser *parser {new Parser{debug}};
+    Parser *parser {new Parser {debug}};
 
     if (debug)
         std::cout << "Output: \n{\n\n";

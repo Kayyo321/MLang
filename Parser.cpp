@@ -17,6 +17,7 @@ Parser::Parser(bool _isDebug)
     strFunc["PORTION"] = &Portion;
     strFunc["RELEASE"] = &Release;
     strFunc["APPEND"] = &Append;
+    strFunc["STR_COMB"] = &StrComb;
     strFunc["FREE"] = &Free;
     strFunc["FREE_ARR"] = &FreeArr;
     strFunc["FREE_PORTION"] = &FreePort;
@@ -31,6 +32,7 @@ Parser::Parser(bool _isDebug)
     Funcs.emplace_back("PORTION");
     Funcs.emplace_back("RELEASE");
     Funcs.emplace_back("APPEND");
+    Funcs.emplace_back("STR_COMB");
     Funcs.emplace_back("FREE");
     Funcs.emplace_back("FREE_ARR");
     Funcs.emplace_back("FREE_PORTION");
@@ -166,8 +168,8 @@ void Parser::ParseID()
                     }
 
                     const char *expr {tokensOnLine[i + 2].text.c_str()};
-                    const std::string &varName {tokensOnLine[0].text};
-                    long double newVal {Math(expr)};
+                    const char *varName {tokensOnLine[0].text.c_str()};
+                    const long double newVal {Math(expr)};
 
                     variables[varName].text = std::to_string(newVal);
                 }
@@ -184,7 +186,7 @@ void Parser::ParseID()
     }
 }
 
-std::string Print()
+void Print()
 {
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
@@ -198,7 +200,7 @@ std::string Print()
             {
                 /* Function call */
 
-                std::cout << strFunc[curToken.text]();
+                strFunc[curToken.text]();
 
                 continue;
             }
@@ -214,7 +216,7 @@ std::string Print()
             {
                 if (tokensOnLine[i + 1].type == INT)
                 {
-                    int index {std::stoi(tokensOnLine[i + 1].text)};
+                    const int index {std::stoi(tokensOnLine[i + 1].text)};
 
                     std::cout << arrays[curToken.text].children[index].text;
 
@@ -224,7 +226,7 @@ std::string Print()
                 {
                     if (variables[tokensOnLine[i + 1].text].dataType == INT)
                     {
-                        int index {std::stoi(variables[tokensOnLine[i + 1].text].text)};
+                        const int index {std::stoi(variables[tokensOnLine[i + 1].text].text)};
 
                         std::cout << arrays[curToken.text].children[index].text;
 
@@ -264,11 +266,9 @@ std::string Print()
             std::cout << curToken.text;
         }
     }
-
-    return {};
 }
 
-std::string Let()
+void Let()
 {
     Variable x;
 
@@ -298,13 +298,13 @@ std::string Let()
                         );
                     }
 
-                    std::string _name {curToken.text};
+                    const char *_name {curToken.text.c_str()};
 
                     if (curToken.text[0] == '$')
                     {
                         x.isConst = true;
 
-                        _name.erase();
+                        _name = "";
 
                         for (size_t o {0}; o < curToken.text.size(); ++o)
                         {
@@ -356,9 +356,9 @@ std::string Let()
                 {
                     if (curToken.text == "TE_MATH")
                     {
-                        std::string _tokens {tokensOnLine[4].text};
-                        _tokens = GetVarsInStr(_tokens);
-                        long double val {Math(_tokens.c_str())};
+                        const char *_tokens {tokensOnLine[4].text.c_str()};
+                        _tokens = GetVarsInStr(_tokens).c_str();
+                        long double val {Math(_tokens)};
 
                         if (IsWhole(val))
                         {
@@ -417,12 +417,10 @@ std::string Let()
     variables[x.name] = x;
 
     if (isIf)
-        scopeVars.push_back(x.name);
-
-    return {};
+        scopeVars.emplace_back(x.name);
 }
 
-std::string Arr()
+void Arr()
 {
     Array x;
     x.dataType = NULL_VAL;
@@ -592,16 +590,13 @@ std::string Arr()
     arrays[x.name] = x;
 
     if (isIf)
-        scopeArrs.push_back(x.name);
-
-    return {};
+        scopeArrs.emplace_back(x.name);
 }
 
-std::string If()
+void If()
 {
-    std::string lhs;
+    const char *lhs, *rhs;
     BoolOperator op;
-    std::string rhs;
 
     unsigned long long endif;
 
@@ -617,18 +612,9 @@ std::string If()
             case 1:
                 if (curToken.type == IDENTIFIER)
                 {
-                    if (InArray(curToken.text, Funcs))
-                    {
-                        /* Function call */
-
-                        lhs = (strFunc[curToken.text]());
-
-                        break;
-                    }
-
                     if (IsVar(curToken.text))
                     {
-                        lhs = (variables[curToken.text].text);
+                        lhs = (variables[curToken.text].text.c_str());
 
                         break;
                     }
@@ -646,7 +632,7 @@ std::string If()
                 }
                 else
                 {
-                    lhs = curToken.text;
+                    lhs = curToken.text.c_str();
                 }
                 break;
 
@@ -691,18 +677,9 @@ std::string If()
             case 3:
                 if (curToken.type == IDENTIFIER)
                 {
-                    if (InArray(curToken.text, Funcs))
-                    {
-                        /* Function call */
-
-                        rhs = (strFunc[curToken.text]());
-
-                        break;
-                    }
-
                     if (IsVar(curToken.text))
                     {
-                        rhs = (variables[curToken.text].text);
+                        rhs = (variables[curToken.text].text.c_str());
 
                         break;
                     }
@@ -720,7 +697,7 @@ std::string If()
                 }
                 else
                 {
-                    rhs = curToken.text;
+                    rhs = curToken.text.c_str();
                 }
                 break;
 
@@ -769,10 +746,10 @@ std::string If()
     isIf = true;
 
 Skip:
-    return {};
+    return;
 }
 
-std::string EndIf()
+void EndIf()
 {
     isIf = false;
 
@@ -797,8 +774,6 @@ std::string EndIf()
             }
         }
     }
-
-    return {};
 }
 
 void Goto(size_t line)
@@ -849,7 +824,7 @@ void Goto(size_t line)
     isGoto = true;
 }
 
-std::string Goto()
+void Goto()
 {
     size_t line {0};
 
@@ -940,11 +915,9 @@ std::string Goto()
     }
 
     isGoto = true;
-
-    return {};
 }
 
-std::string End()
+void End()
 {
     int exitCode {0};
 
@@ -995,9 +968,9 @@ std::string End()
     exit(exitCode);
 }
 
-std::string Portion()
+void Portion()
 {
-    std::string ref {}, path {};
+    const char *ref {}, *path {};
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
@@ -1011,7 +984,7 @@ std::string Portion()
             case 1:
                 if (token.type == IDENTIFIER)
                 {
-                    ref = token.text;
+                    ref = token.text.c_str();
 
                     continue;
                 }
@@ -1048,7 +1021,7 @@ std::string Portion()
             case 3:
                 if (token.type == STRING)
                 {
-                    path = token.text;
+                    path = token.text.c_str();
 
                     continue;
                 }
@@ -1079,7 +1052,7 @@ std::string Portion()
     }
 
     std::ifstream file {path};
-    std::string contents
+    const std::string contents
     {
         (std::istreambuf_iterator<char>(file)),
         std::istreambuf_iterator<char>()
@@ -1087,14 +1060,12 @@ std::string Portion()
 
     Lexer lexer {};
 
-    const std::vector<Tok> port {lexer.Parse(contents, isDebug)};
+    const std::vector<Tok> port {lexer.Parse(contents.c_str(), isDebug)};
 
     portions[ref] = port;
-
-    return {};
 }
 
-std::string Release()
+void Release()
 {
     if (tokensOnLine.size() < 2 || tokensOnLine.size() > 2)
     {
@@ -1110,11 +1081,11 @@ std::string Release()
         );
     }
 
-    std::string ref {};
+    const char *ref {};
 
     if (tokensOnLine[1].type == IDENTIFIER)
     {
-        ref = tokensOnLine[1].text;
+        ref = tokensOnLine[1].text.c_str();
     }
 
     if (IsPort(ref))
@@ -1135,13 +1106,11 @@ std::string Release()
             + std::string(").")
         );
     }
-
-    return {};
 }
 
-std::string Append()
+void Append()
 {
-    std::string arrName {};
+    const char *arrName {};
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
@@ -1155,7 +1124,7 @@ std::string Append()
             case 1:
                 if (IsArr(token.text))
                 {
-                    arrName = token.text;
+                    arrName = token.text.c_str();
 
                     continue;
                 }
@@ -1181,9 +1150,9 @@ std::string Append()
                 {
                     if (token.text == "TE_MATH")
                     {
-                        std::string _tokens {token.text};
-                        _tokens = GetVarsInStr(_tokens);
-                        long double val {Math(_tokens.c_str())};
+                        const char *_tokens {token.text.c_str()};
+                        _tokens = GetVarsInStr(_tokens).c_str();
+                        const long double val {Math(_tokens)};
 
                         if (IsWhole(val) && arrays[arrName].dataType == INT)
                         {
@@ -1274,11 +1243,130 @@ std::string Append()
                 );
         }
     }
-
-    return {};
 }
 
-std::string Free()
+void StrComb()
+{
+    const char *varName {}, *tmpText {};
+
+    for (size_t i {0}; i < tokensOnLine.size(); ++i)
+    {
+        const Tok &curToken {tokensOnLine[i]};
+
+        if (i == 0) { continue; }
+        else if (i == 1)
+        {
+            if (IsVar(curToken.text))
+            {
+                if (variables[curToken.text].dataType != STRING)
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Origin variable must be a string for STR_COMB: ")
+                        + curToken.text
+                        + std::string(". (")
+                        + std::to_string(curToken.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(curToken.charIndex)
+                        + std::string(").")
+                    );
+                }
+
+                varName = curToken.text.c_str();
+
+                tmpText = variables[curToken.text].text.c_str();
+            }
+            else
+            {
+                throw std::runtime_error
+                (
+                    std::string("Couldn't find variable: ")
+                    + curToken.text
+                    + std::string(". (")
+                    + std::to_string(curToken.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(curToken.charIndex)
+                    + std::string(").")
+                );
+            }
+        }
+        else if (i == 2)
+        {
+            if (curToken.text != "+")
+            {
+                throw std::runtime_error
+                (
+                    std::string("Unexpected token: ")
+                    + curToken.text
+                    + std::string(". Expected '+' (")
+                    + std::to_string(curToken.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(curToken.charIndex)
+                    + std::string(").")
+                );
+            }
+        }
+        else if (i == 3)
+        {
+            std::string result {tmpText};
+
+            if (curToken.type == IDENTIFIER && IsVar(curToken.text))
+            {
+                if (variables[curToken.text].dataType != STRING)
+                {
+                    throw std::runtime_error
+                    (
+                        std::string("Combining variable must be string for STR_COMB: ")
+                        + curToken.text
+                        + std::string(". (")
+                        + std::to_string(curToken.lineNumber)
+                        + std::string(", ")
+                        + std::to_string(curToken.charIndex)
+                        + std::string(").")
+                    );
+                }
+
+                result += variables[curToken.text].text;
+
+                variables[varName].text = result;
+            }
+            else if (curToken.type == STRING)
+            {
+                result += curToken.text;
+
+                variables[varName].text = result;
+            }
+            else
+            {
+                throw std::runtime_error
+                (
+                    std::string("Unexpected token: ")
+                    + curToken.text
+                    + std::string(". Expected a string (")
+                    + std::to_string(curToken.lineNumber)
+                    + std::string(", ")
+                    + std::to_string(curToken.charIndex)
+                    + std::string(").")
+                );
+            }
+        }
+        else
+        {
+            throw std::runtime_error
+            (
+                std::string("Incorrect argument count for STR_COMB: ")
+                + curToken.text
+                + std::string(". Expected argc is 3 (")
+                + std::to_string(curToken.lineNumber)
+                + std::string(", ")
+                + std::to_string(curToken.charIndex)
+                + std::string(").")
+            );
+        }
+    }
+}
+
+void Free()
 {
     if (tokensOnLine.size() != 2)
     {
@@ -1311,11 +1399,9 @@ std::string Free()
     }
 
     variables.erase(varName.text);
-
-    return {};
 }
 
-std::string FreeArr()
+void FreeArr()
 {
     if (tokensOnLine.size() != 2)
     {
@@ -1348,11 +1434,9 @@ std::string FreeArr()
     }
 
     arrays.erase(arrName.text);
-
-    return {};
 }
 
-std::string FreePort()
+void FreePort()
 {
     if (tokensOnLine.size() != 2)
     {
@@ -1385,8 +1469,6 @@ std::string FreePort()
     }
 
     portions.erase(portName.text);
-
-    return {};
 }
 
 bool CheckIf(const std::string &lhs, enum BoolOperator op, const std::string &rhs)
@@ -1479,7 +1561,7 @@ bool IsWhole(long double d)
 
 void ReAssignVar()
 {
-    std::string var;
+    const char *var;
 
     for (size_t i {0}; i < tokensOnLine.size(); ++i)
     {
@@ -1490,7 +1572,7 @@ void ReAssignVar()
             case 0:
                 if (IsVar(curToken.text))
                 {
-                    var = curToken.text;
+                    var = curToken.text.c_str();
 
                     if (variables[var].isConst)
                     {
@@ -1558,9 +1640,9 @@ void ReAssignVar()
                 {
                     if (curToken.text == "TE_MATH")
                     {
-                        std::string _tokens {tokensOnLine[i + 1].text};
-                        _tokens = GetVarsInStr(_tokens);
-                        long double val {Math(_tokens.c_str())};
+                        const char *_tokens {tokensOnLine[i + 1].text.c_str()};
+                        _tokens = GetVarsInStr(_tokens).c_str();
+                        long double val {Math(_tokens)};
 
                         if (IsWhole(val) && variables[var].dataType == INT)
                         {
@@ -1604,7 +1686,7 @@ void ReAssignVar()
             case 3:
                 if (curToken.type == variables[var].dataType)
                 {
-                    const std::string &token {tokensOnLine[3].text};
+                    const char *token {tokensOnLine[3].text.c_str()};
                     variables[var].text = token;
                 }
                 break;
@@ -1626,7 +1708,7 @@ void ReAssignVar()
 
 void ReAssignArr()
 {
-    std::string arr {};
+    const char *arr {};
     TokenType arrType {WHITESPACE};
     int index {};
 
@@ -1639,7 +1721,7 @@ void ReAssignArr()
             case 0:
                 if (IsArr(token.text))
                 {
-                    arr = token.text;
+                    arr = token.text.c_str();
 
                     arrType = arrays[token.text].dataType;
 
@@ -1709,9 +1791,9 @@ void ReAssignArr()
                 {
                     if (token.text == "TE_MATH")
                     {
-                        std::string _tokens {tokensOnLine[i + 1].text};
-                        _tokens = GetVarsInStr(_tokens);
-                        long double val {Math(_tokens.c_str())};
+                        const char *_tokens {tokensOnLine[i + 1].text.c_str()};
+                        _tokens = GetVarsInStr(_tokens).c_str();
+                        long double val {Math(_tokens)};
 
                         if (IsWhole(val) && arrays[arr].dataType == INT)
                         {
@@ -1818,13 +1900,13 @@ long double Math(const char *expr)
     );
 }
 
-std::string GetVarsInStr(std::string str)
+std::string GetVarsInStr(const char *str)
 {
     std::string ret {}, delim {};
 
     int stage {0};
 
-    size_t startIndex {}, len {str.length()};
+    size_t startIndex {}, len {strlen(str)};
 
     for (size_t i {0}; i < len; ++i)
     {

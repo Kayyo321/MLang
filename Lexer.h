@@ -10,7 +10,7 @@
 class Lexer
 {
 public:
-    std::vector<Tok> Parse(const std::string &, bool);
+    [[nodiscard]] std::vector<Tok> Parse(const char *, bool);
 
 private:
     Tok curToken;

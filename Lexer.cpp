@@ -1,17 +1,14 @@
 #include "Lexer.h"
 
-std::vector<Tok> Lexer::Parse(const std::string &file, bool _isDebug)
+std::vector<Tok> Lexer::Parse(const char *file, bool _isDebug)
 {
     isDebug = _isDebug;
 
-    const size_t len {file.length()};
-    char program[len + 1];
-
-    strcpy(program, file.c_str());
+    const size_t len {strlen(file)};
 
     for (size_t i {0}; i < len; ++i)
     {
-        const char c {program[i]};
+        const char c {file[i]};
 
         ++curToken.charIndex;
 

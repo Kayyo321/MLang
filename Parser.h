@@ -16,7 +16,7 @@
 class Variable;
 class Array;
 
-static std::map<std::string, std::string (*)()> strFunc;
+static std::map<std::string, void (*)()> strFunc;
 static std::map<std::string, Variable> variables;
 static std::map<std::string, Array> arrays;
 static std::map<std::string, std::vector<Tok>> portions;
@@ -72,19 +72,20 @@ public:
     std::vector<Tok> children;
 };
 
-std::string Print();
-std::string Let();
-std::string Arr();
-std::string If();
-std::string EndIf();
-std::string Goto();
-std::string End();
-std::string Portion();
-std::string Release();
-std::string Append();
-std::string Free();
-std::string FreeArr();
-std::string FreePort();
+void Print();
+void Let();
+void Arr();
+void If();
+void EndIf();
+void Goto();
+void End();
+void Portion();
+void Release();
+void Append();
+void StrComb();
+void Free();
+void FreeArr();
+void FreePort();
 
 void Goto(size_t);
 void ReAssignVar();
@@ -102,4 +103,4 @@ bool IsWhole(long double);
 
 long double Math(const char *);
 
-std::string GetVarsInStr(std::string);
+std::string GetVarsInStr(const char *);
