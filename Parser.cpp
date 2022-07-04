@@ -1336,6 +1336,15 @@ void StrComb()
 
                 variables[varName].text = result;
             }
+            else if (curToken.type == INT)
+            {
+                const int asciiValue {std::stoi(curToken.text)};
+                const char c {(char)asciiValue};
+
+                result += c;
+
+                variables[varName].text = result;
+            }
             else
             {
                 throw std::runtime_error

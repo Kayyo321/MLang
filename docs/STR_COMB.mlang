@@ -1,0 +1,14 @@
+// Using the STR_COMB keyword, you can combine two string
+// tokens. (Either variables, or just string literals.)
+// The structure is as follows:
+// STR_COMB [Origin-variable] + [String-to-combine]
+
+LET str1: "HI"
+LET str2: " THERE"
+
+STR_COMB str1 + str2
+
+PRINT str1 "\n"
+
+// If the [String-to-combine] field is an integer,
+// it will be converted to it's ASCII value.
