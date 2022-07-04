@@ -102,15 +102,30 @@ IF o < 6 700
     GOTO 660
 ENDIF
 
+PRINT "\n--== STRING COMBINE EXAMPLE ==--\n\n"
+
+LET str1: "HI"
+
+PRINT "str1: " str1 "\n"
+
+LET str2: " THERE"
+
+PRINT "str2: " str2 "\n\n"
+
+STR_COMB str1 + str2
+
+PRINT "str1: " str1 "\n"
+
 PRINT "\n--== PORTION/RELEASE EXAMPLE ==--\n\n"
 
 PORTION TEST > "../PortionedCode.mlang"
 
 RELEASE TEST
 
-PRINT "\n\n--== EXIT EXAMPLE (With exit code 0) ==--\n\n"
+PRINT "\n\n--== END"
+PRINT " EXAMPLE (With exit code 0) ==--\n"
 
 END 0
 ```
 
-![Output](ReadMeImg/Output.png)
+![Output](ReadMeImg/Terminal.png)
